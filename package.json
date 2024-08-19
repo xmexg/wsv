@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "animate.css": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "jquery": "^3.7.1",
     "pagepiling.js": "^1.5.6",
     "vue": "^3.4.29"

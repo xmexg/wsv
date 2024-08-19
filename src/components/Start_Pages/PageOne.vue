@@ -1,13 +1,13 @@
 <template>
     <div id="logo">
         <div v-if="show" class="animate__animated animate__zoomInDown">
-            <span style="color: #ff6348">The Next</span>&nbsp<span style="color: #0050c2">wkyd</span>
+            <span v-for="item in thenext" class="textanimate" style="color: #ff6348">{{ item }}</span>&nbsp<span v-for="item in wkyd" class="textanimate" style="color: #0050c2">{{ item }}</span>
         </div>
-        <div class="animate__animated animate__bounceInLeft text_color">下一代运动神器！</div>
+        <div class="animate__animated animate__bounceInLeft text_color"><span v-for="item in text" class="textanimate">{{ item }}</span></div>
     </div>
     <div v-if="showbar" id="bar" class="animate__animated animate__fadeInUp">
-        <a href="#page2">立即使用</a>
-        <a href="#page3">产品介绍</a>
+        <a href="#page2">自动运动</a>
+        <a href="#page3">手动运动</a>
         <a href="#page4">其他产品</a>
         <a href="#page5">关于我们</a>
     </div>
@@ -61,15 +61,28 @@
     -webkit-background-clip: text;
     background-clip: text;
 }
+
+.textanimate {
+    transition: .5s;
+}
+
+.textanimate:hover {
+    font-size: 1.5em;
+    font-weight: bolder;
+}
 </style>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 let show = ref(true)
 let showbar = ref(false)
+const thenext = ref('The Next'.split(''))
+const wkyd = ref('wkyd'.split(''))
+const text = ref('下一代运动神器！'.split(''))
+
 onMounted(() => {
     setTimeout(() => {
         showbar.value = true
-    }, 2000)
+    }, 1500)
 })
 </script>

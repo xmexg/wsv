@@ -49,5 +49,8 @@ body,
   justify-content: center;
   align-items: center;
   overflow: auto;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
 }
 </style>
