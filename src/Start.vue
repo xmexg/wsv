@@ -1,4 +1,5 @@
 <script setup>
+
 import { onMounted } from 'vue';
 import 'pagepiling.js';
 import 'pagepiling.js/dist/jquery.pagepiling.css';
@@ -10,14 +11,13 @@ import PageThree from './components/Start_Pages/PageThree.vue';
 import PageFour from './components/Start_Pages/PageFour.vue';
 import PageFive from './components/Start_Pages/PageFive.vue';
 
-import App from './App.vue';
-import HelloWorld from './components/HelloWorld.vue';
-import TheWelcome from './components/TheWelcome.vue';
+
 
 onMounted(() => {
   $('#pagepiling').pagepiling({
     passive: true,
     anchors: ['page1', 'page2', 'page3', 'page4', 'page5'],
+    normalScrollElements: '.normalScroll', // 包含该属性的元素正常滚动
   });
 });
 </script>

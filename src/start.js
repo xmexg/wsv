@@ -13,6 +13,10 @@ console.log(`
      `);
 
 import { createApp } from "vue";
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
 import Start from "./Start.vue";
 
-createApp(Start).mount("#start");
+const app = createApp(Start);
+app.use(ElementPlus);
+app.mount("#start");

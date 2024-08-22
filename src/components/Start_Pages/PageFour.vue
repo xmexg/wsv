@@ -5,6 +5,7 @@
             <h2>其他产品</h2>
             <div id="product">
                 <div><a href="http://121.40.92.198:9090">旧版wkyd</a></div>
+                <div><a :href="`${service}/run`">wsn(springboot)内置wkyd</a></div>
                 <!-- <div>学习强国</div>
                 <div>图片ai换脸</div>
                 <div>视频ai换脸</div>
@@ -13,6 +14,21 @@
         </div>
     </div>
 </template>
+
+<script>
+import axios from "axios";
+export default {
+    data() {
+        return {
+            service: import.meta.env.VITE_WSN_SERVICE_URL
+        };
+    },
+    methods: {
+        
+    },
+};
+</script>
+
 <style scoped>
 #bg {
     position: absolute;
