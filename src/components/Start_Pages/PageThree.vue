@@ -1,65 +1,75 @@
 <template>
     <div id="page">
         <div> 手动运动 </div>
+        <p>该功能尚未完全完成,请使用旧版 <a href="http://121.40.92.198:9090">http://121.40.92.198:9090</a></p>
         <div class="content">
-            <!-- <h2>该功能尚未完全完成，请使用旧版<a href="http://121.40.92.198:9090">http://121.40.92.198:9090</a></h2> -->
             <div id="form" class="normalScroll">
-                <div class="fd">salt:<input class="U D block" type="text" name="salt" id="salt" placeholder="salt(8位0-9和a-f,不合规无法提交)" v-model="salt" maxlength="8"></div>
-                <div class="fd">sign:<input class="U D block" type="text" name="sign" id="sign" placeholder="访问学校服务器时的sign" v-model="sign" disabled></div>
+                <div class="fd">salt:<input class="U D block" type="text" name="salt" id="salt"
+                        placeholder="salt(8位0-9和a-f,不合规无法提交)" v-model="salt" maxlength="8"></div>
+                <div class="fd">sign:<input class="U D block" type="text" name="sign" id="sign"
+                        placeholder="访问学校服务器时的sign" v-model="sign" disabled></div>
                 <div class="fd">启用流(axios+xhr)<input type="checkbox" v-model="able_stream"></div>
-                <div class="fd">学号:<input class="H block" type="text" name="id" id="id" placeholder="学号" th:value="${user_id}" v-model="userId" required></div>
-                <el-button class="downblock" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">查看跑步评分 & 更新手机型号</el-button>
-                <el-dialog v-model="showRunRecodesAphonelist" title="跑步评分" class="normalScroll" draggable>
+                <div class="fd">学号:<input class="H block" type="text" name="id" id="id" placeholder="学号"
+                        th:value="${user_id}" v-model="userId" required></div>
+                <el-button class="downblock" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">查看跑步评分 &
+                    更新手机型号</el-button>
+                <el-dialog v-model="showRunRecodesAphonelist" title="跑步评分" class="normalScroll el-dialog" draggable>
                     <div class="el_bar">
-                        <input type="number" max="15" class="el_usercode" :value="userId" ref="userId_search_input" placeholder="请输入要查询的学号">
-                        <button class="el_usercode_btn" @click="getRunRecodesAphonelist($refs.userId_search_input.value)" :disabled="getRunRecodesAphonelist_lock">{{ getRunRecodesAphonelist_lock ? "更新中" : "更新" }}</button>
+                        <input type="number" max="15" class="el_usercode" :value="userId" ref="userId_search_input"
+                            placeholder="请输入要查询的学号">
+                        <button class="el_usercode_btn"
+                            @click="getRunRecodesAphonelist($refs.userId_search_input.value)"
+                            :disabled="getRunRecodesAphonelist_lock">{{ getRunRecodesAphonelist_lock ? "更新中" : "更新"
+                            }}</button>
                     </div>
-                    <div>测试渲染</div>
-                    <div v-for="(user_recodes, user_id, user_index) in runRecodes" style="max-height: 50vh; width: 100%;" >
-                        <!-- bug 这个div总是不渲染 -->
-                        <h3>跑步信息</h3>
-                        <p>学号: {{ user_id }}</p>
-                        <div style="overflow: auto; z-index: 9;">
-                            <table class="normalScroll RunRecodesAphonelist" style="width: 100%; border-collapse: collapse; scrollbar-width: none; -ms-overflow-style: none;" border="1">
-                                <thead>
-                                    <tr>
-                                        <th>id</th>
-                                        <th>size</th>
-                                        <th>数据ID</th>
-                                        <th>评分</th>
-                                        <th>创建时间</th>
-                                        <th>总路程</th>
-                                        <th>手机型号</th>
-                                        <th>用户ID</th>
-                                        <th>中转用时</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="record in user_recodes" :key="record.id">
-                                        <td>{{ record.id }}</td>
-                                        <td>{{ record.size }}</td>
-                                        <td>{{ record.runId }}</td>
-                                        <td>{{ record.score }}</td>
-                                        <td>{{ record.createTime }}</td>
-                                        <td>{{ record.trueLength }}</td>
-                                        <td>{{ record.outphoneInfo }}</td>
-                                        <td>{{ record.userId }}</td>
-                                        <td>{{ record.serverSpendTime }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="userrecodelist">
+                        <div v-for="(user_recodes, user_id, user_index) in runRecodes" :key="user_index"
+                            style="width: 100%;">
+                            <p class="normalScroll" style="margin: 0; padding: 1em 0;">学号: {{ decodedUserId(user_id) }}</p>
+                            <div style="overflow: auto; z-index: 9;">
+                                <table class="normalScroll RunRecodesAphonelist"
+                                    style="width: 100%; border-collapse: collapse; scrollbar-width: none; -ms-overflow-style: none;"
+                                    border="1">
+                                    <thead>
+                                        <tr>
+                                            <th>id</th>
+                                            <th>size</th>
+                                            <th>数据ID</th>
+                                            <th>评分</th>
+                                            <th>创建时间</th>
+                                            <th>总路程</th>
+                                            <th>手机型号</th>
+                                            <th>用户ID</th>
+                                            <th>中转用时</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="record in user_recodes" :key="record.runId">
+                                            <td>{{ record.id }}</td>
+                                            <td>{{ record.size }}</td>
+                                            <td>{{ record.runId }}</td>
+                                            <td>{{ record.score }}</td>
+                                            <td>{{ record.createTime }}</td>
+                                            <td>{{ record.trueLength }}</td>
+                                            <td @click="usephoneInfo" style="cursor: pointer; color: blue;">{{ record.outphoneInfo }}</td>
+                                            <td>{{ record.userId }}</td>
+                                            <td>{{ record.serverSpendTime }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </el-dialog>
                 <div class="fd">系统类型:<input class="H block" type="text" name="ostype" id="ostype"
                         placeholder="系统类型(android/iOS)" required value="android"></div>
                 <div class="fd">版本号:<input class="H block" type="text" name="version" id="version"
-                        placeholder="安卓:系统版本号13/苹果:软件版本号1.0.3" required></div>
+                        placeholder="安卓:系统版本号13/苹果:软件版本号1.0.3" v-model="UAversion" required></div>
                 <div id="appbrand" class="fd">手机品牌:
                     <div id="appbranddiv">
                         <div id="appbrandselectdiv">
                             <button class="selectedBrand downblock" id="selectedBrand"
-                                @click="showBrandSelect()">读取服务器端历史型号</button>
+                                @click="showHistoryPhoneInfo = !showHistoryPhoneInfo">读取服务器端历史型号</button>
                             <select v-model="selectedAndroidBrand" class="selectedBrand" id="selectedAndroidBrand">
                                 <option value="default">选择安卓品牌</option>
                                 <optgroup v-for="(subBrands, brandind) in androidbrands" :label="brandind">
@@ -76,19 +86,23 @@
                             placeholder="手机品牌(Xiaomi/iPhone)" id="selectedBrandInput" disabled />
                     </div>
                 </div>
+                <el-dialog v-model="showHistoryPhoneInfo" title="选择过往型号" class="normalScroll el-dialog" draggable>
+                    <div style="cursor: pointer;" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">⚡使用评分功能更新列表</div>
+                    <div style="cursor: pointer;" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">在评分列表点击要使用的手机型号即可</div>
+                </el-dialog>
                 <div class="fd">手机型号:<input class="H block" type="text" name="phone" id="phone" v-model="phone"
                         placeholder="(Xiaomi M2011K2C/iPhone14,7)" required value="Xiaomi M2011K2C"></div>
                 <div class="fd">苹果:<input class="H block" type="text" name="OsVersion" id="OsVersion"
-                        placeholder="苹果需额外填写系统版本号(16.3.1)"></div>
+                        placeholder="苹果需额外填写系统版本号(16.3.1)" v-model="UAOsVersion"></div>
                 <div class="fd">UA:<input class="H D block" type="text" name="useragent" id="useragent"
-                        placeholder="请求头(okhttp/4.5.0)" required value="okhttp/4.5.0" disabled></div>
+                        placeholder="请求头(okhttp/4.5.0)" required v-model="useragent" disabled></div>
                 <div class="fd">Loc-UA:<input class="H D block" type="text" name="Loc-UA" v-model="Loc_UA" readonly>
                 </div>
                 <div class="fd">
                     距离(米):
                     <div class="input-wrapper">
                         <input class="block" type="number" name="totalGeoLength" id="totalGeoLength"
-                            placeholder="运动距离(3030),锁定状态下自动填写" :disabled="totalGeoLength_lock">
+                            placeholder="(3030),锁定自动填写" :disabled="totalGeoLength_lock">
                         <button @click="totalGeoLength_lock = !totalGeoLength_lock"
                             :class="{ 'red': totalGeoLength_lock, 'blue': !totalGeoLength_lock }" class="toggle-button">
                             &#x1F512;
@@ -99,7 +113,7 @@
                     时间(秒):
                     <div class="input-wrapper">
                         <input class="block" type="number" name="totalTimeLength" id="totalTimeLength"
-                            placeholder="运动时长(1469),锁定状态下自动填写" :disabled="totalTimeLength_lock">
+                            placeholder="(1469),锁定自动填写" :disabled="totalTimeLength_lock">
                         <button @click="totalTimeLength_lock = !totalTimeLength_lock"
                             :class="{ 'red': totalTimeLength_lock, 'blue': !totalTimeLength_lock }"
                             class="toggle-button">
@@ -115,17 +129,20 @@
                         value="1" disabled>
                 </div>
 
-                <div class="fd">节点间隔:<input class="block" type="number" id="nodespace"
-                        placeholder="手机:0,电脑:3,提高节点间隔,减少路线锯齿" onchange="nodespacechange()"></div>
+                <div class="fd">路线节点间隔:<input class="block" type="number" id="nodespace"
+                        placeholder="点画:0,拖画:3,路线抗锯齿" onchange="nodespacechange()"></div>
                 <div class="fd">节点合理化(仅对自画路线生效):<input class="checkbox block" type="checkbox" id="pointconv"
                         name="pointconv" checked>
                 </div>
 
                 <div class="fd">地图类型:
-                    <select class="S block" name="mapdatatype" id="mapdatatype">
+                    <!-- <select class="S block" name="mapdatatype" id="mapdatatype">
                         <option value="m" selected onclick="mapshowmap()">画出跑步路线</option>
                         <option class="D" value="b" onclick="mapshowtext()">自定义跑步json数据</option>
                         <option value="o" onclick="mapshowOLDMAPD()">提交学校服务器已存在的数据</option>
+                    </select> -->
+                    <select v-model="selectedMapType" class="S block">
+                        <option v-for="subBrands in mapType" :value="subBrands.brand">{{ subBrands.name }}</option>
                     </select>
                 </div>
             </div>
@@ -145,17 +162,23 @@
                     </div>
                 </div>
                 <div id="mapcanvasdiv">
-                    <div id="get4point">获取打卡点(不必要)<div id="get4pointres"></div>
+                    <div v-if="selectedMapType == 'draw_mapType'" id="get4point">获取打卡点(不必要)<div id="get4pointres"></div></div>
+                    <!-- 自画路线工具 -->
+                    <div v-if="selectedMapType == 'draw_mapType'" id="draw_map_tools">
+                        <button v-bind="isNewStartPoint" @click="isNewStartPoint=!isNewStartPoint" :class="{'maptools_btn_active':isNewStartPoint, 'maptools_btn':!isNewStartPoint}">断点</button>
+                        <button>撤回</button>
+                        <button @click="clean_drawmap">清空</button>
+                        <button>路线分段(未完成)</button>
                     </div>
                     <!-- 在画板顶层放置一个隐形的div,用于放置一些标记 -->
-                    <div id="canvasTOP">
+                    <div v-if="selectedMapType == 'draw_mapType'" id="canvasTOP">
                         <!-- <image id="testimg" th:src="@{/res/local_br.png}" src="../static/res/local_br.png" width="20px" style="left: 310.31583182445206px;top: 278.5985327600884px;"></image> -->
                     </div>
 
-                    <canvas id="mapcanvasdivcan" class="mapcanvasdivcan" width="690" height="690"></canvas>
-                    <textarea id="mapcanvasdivtext" class="D mapcanvasdivtext" name="mapdata"
+                    <canvas v-if="selectedMapType == 'draw_mapType'" id="mapcanvasdivcan" class="mapcanvasdivcan" width="690" height="690" @mousedown="drawMouseDown($event)" @mousemove="drawMouseMove($event)" @mouseup="drawMouseUp($event)" @click="drawMouseClick($event)"></canvas>
+                    <textarea v-if="selectedMapType == 'write_mapType'" id="mapcanvasdivtext" class="D mapcanvasdivtext" name="mapdata"
                         placeholder="自定义跑步json数据,此处文本会作为latLng的值"></textarea>
-                    <div id="mapcanvasdivcan_js_div" width="100%" height="100%" style="display: none;"></div>
+                    <div v-if="selectedMapType == 'copy_mapType'" id="mapcanvasdivcan_js_div" width="100%" height="100%" style="display: flex;"></div>
                 </div>
                 <div class="fd" id="subdata">完成运动</div>
             </div>
@@ -168,6 +191,7 @@ import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import VueVirtualScroller from 'vue-virtual-scroller';
 import {Base64} from 'js-base64'
+import { ElNotification } from 'element-plus';
 const baseHost = import.meta.env.VITE_WSN_SERVICE_URL
 axios.defaults.baseURL = import.meta.env.VITE_WSN_SERVICE_URL
 export default {
@@ -254,29 +278,62 @@ export default {
             selectedAndroidBrand: "Xiaomi",
             selectediPhoneBrand: "iPhone15,4",
             selectedBrandInput: "",
+            default_phone: "Xiaomi M2011K2C",
             phone: "Xiaomi M2011K2C",
-            useragent: "okhttp/4.5.0",
+            default_useragent: "okhttp/4.5.0",
+            useragent: "",
             Loc_UA: navigator.userAgent,
-            runRecodes: [], // 运动记录和评分
+            runRecodes: {}, // 运动记录和评分
             historyPhoneInfo: [], // 历史手机型号
             showRunRecodesAphonelist: false, // 是否显示运动记录和评分
-            history_RunRecodesAphonelist: [], // 历史运动记录和评分
+            showHistoryPhoneInfo: false, // 是否显示历史手机型号
             totalGeoLength_lock: true, // 距离是否锁定
             totalTimeLength_lock: true, // 时间是否锁定
             getRunRecodesAphonelist_lock: false, // 获取运动记录和评分锁定
             totalGeoLength: '', // 距离
             totalTimeLength: '', // 时间
-            able_stream: true, // 是否启用流, 仅电脑端有效
+            able_stream: true, // 是否启用流
+            APPversion: "1.0.3",//跑步软件版本号,苹果系统填写此参数,安卓系统不填写此参数
+            Androidversion: "",//安卓系统版本号,安卓系统应该填写此参数,苹果系统不填写此参数(本地缓存)
+            UAversion: "",//通过UA获取到的系统版本,安卓系统应该填写此参数,苹果系统不填写此参数填写跑步软件的版本号(提交)
+            UAOsModel: "",//安卓系统用于填写手机型号的一部分参数,这里是通过UA获取的,还有一部分是用户通过下拉框选择的
+            UAOsVersion: "",//通过UA获取到的系统版本,苹果系统专有的参数
+            mapType: [ // 地图类型
+                {name: "画出跑步路线", brand: "draw_mapType"},
+                {name: "自定义跑步json数据", brand: "write_mapType"},
+                {name: "提交学校服务器已存在的数据", brand: "copy_mapType"}
+            ],
+            selectedMapType: "draw_mapType", // 当前选择的地图类型
+            // 自画地图相关
+            isStartPosition: true, // 是否是起始点
+            isNewStartPoint: true, // 是否是新的起始点
+            drawmap_list: [], // 画出的地图点(全程)(画板坐标)
+            drawmap_list_temp: [], // 画出的地图点(临时)(画板坐标)
         };
     },
     mounted() {
-        // 初始化时设置 sign
-        this.updateSign();
         // 显示设备类型
         console.log(navigator.userAgent)
-        console.log(this.getDeviceModel());
+        console.log(this.updateDeviceModel());
+        this.updateDeviceModel();
+        this.updateHeader();
     },
     methods: {
+        // 通知
+        ElNotification(title, message, type) {
+            ElNotification({
+                title: title,
+                message: message,
+                type: type
+            });
+        },
+        // 解码用户id
+        decodedUserId(id) {
+            if(id == "") {
+                return "";
+            }
+            return Base64.decode(id);
+        },
         // 生成8位随机数，包含0-9和a-f
         generateRandomHex() {
             const hexChars = '0123456789abcdef';
@@ -298,27 +355,62 @@ export default {
         updateSign() {
             this.sign = this.getsign(this.salt);
         },
-        // 本地粗略判断是安卓苹果win还是linux设备
-        getDeviceModel() {
+        // 获取安卓设备信息
+        getdAndroideviceInfo() {
+            const androidRegex = /Android\s([\d.]+);\s?([^;\)]*)/i
             const userAgent = navigator.userAgent;
-            let model = '未知设备';
-            // 这里可以根据需要进行更复杂的解析
+            let deviceInfo = {
+                deviceType: 'Unknown',
+                version: '',
+                model: ''
+            };
             if (/Android/.test(userAgent)) {
-                model = 'Android设备';
+                let match = userAgent.match(androidRegex)
+                deviceInfo.deviceType = 'Android';
+                deviceInfo.version = match[1];
+                deviceInfo.model = match[2].split(' ')[0].trim();
+            }
+            return deviceInfo;
+        },
+        // 本地粗略判断是安卓苹果win还是linux设备,并更新UAversion安卓版本号,UAOsModel安卓型号,UAOsVersion苹果版本号
+        updateDeviceModel() {
+            const androidRegex = /Android\s([\d.]+);\s?([^;\)]*)/i
+            const iosRegex = /\(iPhone;.*?OS\s([\d_]+)\s?/i
+            const userAgent = navigator.userAgent
+            let model = 'Unknown'
+            if (/Android/.test(userAgent)) {
+                let match = userAgent.match(androidRegex)
+                model = 'Android'
+                this.Androidversion = match[1]
+                this.UAversion =  match[1]
+                this.UAOsModel = match[2].split(' ')[0].trim()
             } else if (/iPhone/.test(userAgent)) {
-                model = 'iPhone';
+                let match = userAgent.match(iosRegex)
+                model = 'iPhone'
+                this.UAversion = this.APPversion
+                this.UAOsVersion = match[1].replace(/_/g, '.')
             } else if (/iPad/.test(userAgent)) {
-                model = 'iPad';
+                model = 'iPad'
             } else if (/Windows/.test(userAgent)) {
-                model = 'Windows设备';
+                model = 'Windows'
             } else if (/Mac OS X/.test(userAgent)) {
-                model = 'Mac设备';
-            } else if (/Linux/.test(userAgent)) {
-                model = 'Linux设备';
+                model = 'Mac设备'
+            } else if (/Linux/.test(userAgent)) { // 包含Android
+                model = 'Linux'
             }
             return model;
         },
-        // 在服务器获取历史型号
+        // 更新header
+        updateHeader() {
+            console.log("更新header");
+            let DeviceMode = this.updateDeviceModel()
+            // 初始化时设置 sign
+            this.updateSign();
+            // 初始化时设置 useragent
+            this.useragent = DeviceMode == "iPhone" ? "RunWay/"+this.APPversion+" (iPhone; iOS "+ this.selectedBrandInput +"; Scale/3.00)" : this.default_useragent;
+            // 初始化时设置 手机型号
+        },
+        // 在服务器获取历史型号, 过时的方法
         showBrandSelect() {
             console.log('获取历史型号');
             if (this.able_stream) {
@@ -335,6 +427,29 @@ export default {
                 alert("请在电脑端使用")
             }
         },
+        // 点击确定使用该手机型号
+        usephoneInfo(event) {
+            // console.log(event)
+            let phoneInfo = event.target.innerText
+            console.log(event.target.innerText)
+            if(phoneInfo == "") {
+                this.ElNotification("提示", "该手机型号为空", "warning")
+            }
+            if(phoneInfo.startsWith("android")) {
+                // 分别是android_版本号_型号
+                let phoneInfo_list = phoneInfo.split('_')
+                this.selectedBrandInput = "来自历史型号"
+                this.UAversion = phoneInfo_list[1]
+                this.phone = phoneInfo_list[2]
+                this.useragent = this.default_useragent
+                this.ElNotification("成功选择手机型号", "已选择: 安卓 "+ phoneInfo_list[1] + " " + phoneInfo_list[2], "success")
+            } else {
+                this.ElNotification("提示", "目前仅支持安卓", "info")
+            }
+            // this.selectedBrandInput = event.target.innerText
+            // this.phone = event.target.innerText
+            // this.useragent = "RunWay/"+this.APPversion+" (iPhone; iOS "+ this.selectedBrandInput +"; Scale/3.00)"
+        },
         /**
          * 获取运行记录和评分和历史手机型号
          * @param userid  用户id, 应确保放入列表的是string类型而不是int类型
@@ -345,7 +460,6 @@ export default {
             }
             this.getRunRecodesAphonelist_lock = true;
             let userid_base64 = Base64.encode(userid);
-            console.log(userid + " " + userid_base64)
             this.runRecodes[userid_base64] = [];
             let reslen = 0;
             if (this.able_stream) { // 启用流
@@ -363,17 +477,18 @@ export default {
                         reslen = responseText.length // 必须赶在下次获取到数据前执行
                         let addaprt_split = addpart.trim().split("\n")
                         addaprt_split.forEach(element => {
-                            // console.log(element)
-                            // console.debug(JSON.parse(element))
                             this.runRecodes[userid_base64].push(JSON.parse(element))
                         });
                     }
                 }).then(response => { // 全部完成时
-                    console.log(this.runRecodes)
+                    this.getRunRecodesAphonelist_lock = false;
+                    // console.log(this.runRecodes[0])
+                    // console.log(this.runRecodes)
+                    // console.log(userid_base64);
                 }).catch(error => {
                     console.error(error);
+                    this.getRunRecodesAphonelist_lock = false;
                 });
-                this.getRunRecodesAphonelist_lock = false;
             } else {
                 console.log('发送请求，获取运动记录和评分');
                 axios.post('/webapi/dfdetection_Stream', {
@@ -381,6 +496,7 @@ export default {
                     salt: this.salt,
                     sign: this.sign
                 }).then(res => {
+                    this.getRunRecodesAphonelist_lock = false;
                     console.log(res.data);
                     let responseText = res.data;
                     //如果返回的数据是空的，就不用处理了
@@ -394,9 +510,40 @@ export default {
                     });
                 }).catch(err => {
                     console.error(err);
+                    this.getRunRecodesAphonelist_lock = false;
                 });
             }
-            this.getRunRecodesAphonelist_lock = false;
+        },
+        /**
+         * 地图相关
+         */
+        // 更新自画地图
+        updateDrawMapInfo(){
+
+        },
+        // 清空画板
+        clean_drawmap(){
+            this.drawmap_list = []
+            this.drawmap_list_temp = []
+            this.isStartPosition = true
+            this.isNewStartPoint = true
+            this.updateDrawMapInfo() // 更新地图信息,待完成
+        },
+        drawMouseDown(e){
+            console.log("drawMouseDown")
+            console.log(e)
+        },
+        drawMouseMove(e){
+            console.log("drawMouseMove")
+            console.log(e)
+        },
+        drawMouseUp(e){
+            console.log("drawMouseUp")
+            console.log(e)
+        },
+        drawMouseClick(e){
+            console.log("drawMouseClick，有Down，Move，Up事件就足够了，不需要该Click事件。")
+            console.log(e)
         },
     },
     watch: {
@@ -406,14 +553,23 @@ export default {
         },
         // 监听 安卓手机型号 的变化
         selectedAndroidBrand(newValue) {
-            if (newValue !== 'default') {
-                this.selectedBrandInput = newValue;
+            this.selectedBrandInput = newValue
+            this.UAversion = this.Androidversion
+            this.phone = newValue + " " + this.UAOsModel
+            this.useragent = this.default_useragent
+            if(newValue == "default") {
+                this.phone = this.default_phone
             }
         },
         // 监听 苹果手机型号 的变化
         selectediPhoneBrand(newValue) {
-            this.selectedBrandInput = newValue;
-            this.phone = newValue;
+            this.selectedBrandInput = newValue
+            this.UAversion = this.APPversion
+            this.phone = newValue
+            this.useragent = "RunWay/"+this.APPversion+" (iPhone; iOS "+ this.selectedBrandInput +"; Scale/3.00)"
+            if(newValue == "default") {
+                this.phone = this.default_phone
+            }
         }
     }
 }
@@ -483,6 +639,9 @@ export default {
     margin: 0 20px;
 }
 
+.fd>*:last-child {
+    flex-grow: 1;
+}
 
 .input-wrapper {
     position: relative;
@@ -516,7 +675,8 @@ export default {
 
 .block {
     font-size: 0.8em;
-    width: 300px;
+    /* width: 270px; */
+    flex-grow: 1;
     border-top: none;
     border-left: none;
     border-right: none;
@@ -657,6 +817,16 @@ export default {
     color: #e74c3c;
 }
 
+#draw_map_tools{
+    z-index: 4;
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+}
+
 #subdata {
     display: flex;
     justify-content: center;
@@ -710,7 +880,7 @@ export default {
 .el_usercode {
     display: flex;
     flex-grow: 1;
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     border: none;
     border-bottom: solid 1px #e16d66;
     color: #e16d66;
@@ -721,7 +891,7 @@ export default {
 }
 
 .el_usercode_btn {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     margin: 20px;
     padding: 5px;
     background: #f08680;
@@ -738,5 +908,24 @@ export default {
 .el_usercode_btn:active {
     background: #e16d66;
     color: #fff;
+}
+
+.userrecodelist{
+    width: 100%;
+    max-height: 50vh;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* 地图相关 */
+.maptools_btn_active {
+    background: #1171d7;
+    color: #fff;
+}
+
+.maptools_btn {
+    background: none;
+    color: #000;
 }
 </style>
