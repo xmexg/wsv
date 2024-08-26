@@ -1,12 +1,12 @@
 <template>
     <div id="status_bar">
         <div v-if="have_token">学号:<span>{{ cookiemap['usercode'] }}</span></div>
-        <div v-else>未登录</div>
+        <div v-else >未登录</div>
         <div style="font-weight: bold;">自动运动</div>
         <div>更换账号</div>
     </div>
     <div>
-        <h1 v-if="have_token"><span v-for="(item, index) in loading_text" :class="{ jump: jump_index == index }">{{ item }}</span></h1>
+        <h1><span v-for="(item, index) in loading_text" :class="{ jump: jump_index == index }">{{ item }}</span></h1>
     </div>
 </template>
 
@@ -19,7 +19,7 @@ let cookiemap = document.cookie.split(';').reduce((prev, current) => {
 }, {})
 console.log(cookiemap)
 let waiting_time = ref(0)
-const loading_text = computed(() => ('正在获取用户信息' + '(' + waiting_time.value + 's)...').split(''))
+const loading_text = computed(() => ('敬请期待' + '(' + waiting_time.value + 's)...').split(''))
 const have_token = ref(cookiemap['token'] != undefined)
 const jump_index = ref(0)
 let i = 0

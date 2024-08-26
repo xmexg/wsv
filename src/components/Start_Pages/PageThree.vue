@@ -8,7 +8,10 @@
                         placeholder="salt(8位0-9和a-f,不合规无法提交)" v-model="salt" maxlength="8"></div>
                 <div class="fd">sign:<input class="U D block" type="text" name="sign" id="sign"
                         placeholder="访问学校服务器时的sign" v-model="sign" disabled></div>
-                <div class="fd">启用流(axios+xhr)<input type="checkbox" v-model="able_stream"></div>
+                <div class="fd">启用流(axios+xhr)
+                    <!-- <input type="checkbox" v-model="able_stream"> -->
+                    <el-switch v-model="able_stream" :active-icon="Check" :inactive="Close"/>
+                </div>
                 <div class="fd">学号:<input class="H block" type="text" name="id" id="id" placeholder="学号"
                         th:value="${user_id}" v-model="userId" required></div>
                 <el-button class="downblock" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">查看跑步评分 &
@@ -131,8 +134,9 @@
 
                 <div class="fd">路线节点间隔:<input class="block" type="number" id="nodespace"
                         placeholder="点画:0,拖画:3,路线抗锯齿" onchange="nodespacechange()"></div>
-                <div class="fd">节点合理化(仅对自画路线生效):<input class="checkbox block" type="checkbox" id="pointconv"
-                        name="pointconv" checked>
+                <div class="fd">节点合理化(仅对自画路线生效):
+                    <!-- <input class="checkbox block" type="checkbox" id="pointconv" name="pointconv" checked> -->
+                    <el-switch v-model="pointconv" :active-icon="Check" :inactive="Close"/>
                 </div>
 
                 <div class="fd">地图类型:
@@ -192,6 +196,7 @@ import axios from 'axios';
 import VueVirtualScroller from 'vue-virtual-scroller';
 import {Base64} from 'js-base64'
 import { ElNotification } from 'element-plus';
+import { Check, Close } from '@element-plus/icons-vue'
 const baseHost = import.meta.env.VITE_WSN_SERVICE_URL
 axios.defaults.baseURL = import.meta.env.VITE_WSN_SERVICE_URL
 export default {
@@ -282,6 +287,7 @@ export default {
             phone: "Xiaomi M2011K2C",
             default_useragent: "okhttp/4.5.0",
             useragent: "",
+            pointconv: true, // 节点合理化
             Loc_UA: navigator.userAgent,
             runRecodes: {}, // 运动记录和评分
             historyPhoneInfo: [], // 历史手机型号
