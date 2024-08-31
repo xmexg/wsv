@@ -107,6 +107,7 @@ export default {
     overflow: auto;
     flex-grow: 1;
     margin: 0 auto;
+    padding-bottom: 100px;
     width: 80%;
     text-align: left;
     font-size: 1.5rem;
