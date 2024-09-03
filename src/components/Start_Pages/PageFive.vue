@@ -11,6 +11,7 @@
                     </ul>
                     </p>
                     <p v-else>{{ item.answer }}</p>
+                    <img v-if="item.image" :src="item.image" alt="wechat" width="70%"/>
                 </li>
             </ul>
         </div>
@@ -36,7 +37,12 @@ export default {
                 },
                 {
                     question: '这个项目和wsb是同一开发者吗?',
-                    answer: '是的,自始至终只有一人开发。'
+                    answer: '是的,自始至终只有一人开发。分发是多人。'
+                },
+                {
+                    question: '联系方式?',
+                    answer: ['Github: https://github.com/xmexg', 'TG: https://t.me/mge0_0'],
+                    image: '/wechat.jpg'
                 },
                 {
                     question: '为什么要另辟蹊径?',
@@ -73,10 +79,6 @@ export default {
                 {
                     question: '这是秒刷还是慢刷？',
                     answer: '秒刷和慢刷是根据完成速度来定义的，对于学校运动软件，没有慢刷，无论是学校原版软件，还是wsb，wsn，都是在一瞬间完成运动的。学校软件仅仅需要学生亲自去运动记录跑路数据而已，wsb和wsn通过科技生成跑步数据。'
-                },
-                {
-                    question: '联系方式?',
-                    answer: ['Github: https://github.com/xmexg', 'TG: https://t.me/mge0_0']
                 }
             ]
         }

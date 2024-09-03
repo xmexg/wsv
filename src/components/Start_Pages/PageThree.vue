@@ -1,7 +1,7 @@
 <template>
     <div id="page">
         <div> 手动运动 </div>
-        <p>该功能尚未完全完成,请使用旧版 <a href="http://121.40.92.198:9090">http://121.40.92.198:9090</a></p>
+        <p style="font-size: 1.3rem;">该功能尚未完全完成,请<a href="#page5">添加微信</a>使用自动运动, 或使用旧版<br><a href="http://121.40.92.198:9090/run">http://121.40.92.198:9090</a>&nbsp<a href="http://121.40.92.198:9091/run">http://121.40.92.198:9091</a></p>
         <div class="content">
             <div id="form" class="normalScroll">
                 <div class="fd">salt:<input class="U D block" type="text" name="salt" id="salt"
@@ -207,7 +207,8 @@ export default {
         return {
             salt: this.generateRandomHex(), // 初始值为随机生成的8位数
             sign: '', // 初始为空，稍后通过watch设置
-            userId: '',
+            // userId: 获取cookie的usercode, 如果没有就是空字符串
+            userId: document.cookie.replace(/(?:(?:^|.*;\s*)usercode\s*\=\s*([^;]*).*$)|^.*$/, "$1"),
             userId_search: '',
             androidbrands: {
                 Samsung: ['Samsung'],
@@ -314,6 +315,15 @@ export default {
             isNewStartPoint: true, // 是否是新的起始点
             drawmap_list: [], // 画出的地图点(全程)(画板坐标)
             drawmap_list_temp: [], // 画出的地图点(临时)(画板坐标)
+            // 来自wkyd_dbshow
+            // 画板参数相关
+            canvasWidth: 690,//画布宽度
+            canvasHeight: 690,//画布高度
+            OriginSX: 118.766916,//原点经度坐标
+            OriginSY: 36.891086,//原点纬度坐标
+            OriginEX: 118.781829,//对点经度坐标
+            OriginEY: 36.879227,//对点纬度坐标
+            GeoW: 1250,//地图地理宽度(cm)
         };
     },
     mounted() {
@@ -322,6 +332,24 @@ export default {
         console.log(this.updateDeviceModel());
         this.updateDeviceModel();
         this.updateHeader();
+    },
+    computed: {
+        // 计算属性, 地图相关
+        OriginW() {
+            return this.OriginEX - this.OriginSX; //经度宽度
+        },
+        OriginH() {
+            return this.OriginEY - this.OriginSY; //纬度高度
+        },
+        RatioX() {
+            return this.OriginW / this.canvasWidth; //经度比例
+        },
+        RatioY() {
+            return this.OriginH / this.canvasHeight; //纬度比例
+        },
+        GeoPixel() {
+            return this.GeoW / this.canvasWidth; //地图像素点长度
+        },
     },
     methods: {
         // 通知

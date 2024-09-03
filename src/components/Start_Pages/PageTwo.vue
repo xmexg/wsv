@@ -1,14 +1,14 @@
 <template>
     <div id="page">
         <div id="status_bar">
-            <div v-if="have_token">学号:<span>{{ cookiemap['usercode'] }}</span></div>
+            <div v-if="have_token"><span>{{ cookiemap['usercode'] }}</span></div>
             <div v-else class="loginbtn" @click="showloginDialog = !showloginDialog">未登录</div>
             <div style="font-weight: bold;">自动运动</div>
             <div @click="showloginDialog = !showloginDialog" class="loginbtn">更换账号</div>
             <el-dialog v-model="showloginDialog" draggable>
                 <h2>登录</h2>
                 <el-input placeholder="请输入学号" v-model="usercode" class="input_usercode" type="number"></el-input>
-                <el-input placeholder="请输入密码" v-model="password" class="input_password" type="password"></el-input>
+                <el-input placeholder="请输入密码" v-model="password" class="input_password" type="text"></el-input>
                 <el-button @click="login_sub" class="el_login_sub" :disable="canclickloginbtn">登录</el-button>
             </el-dialog>
         </div>
@@ -16,6 +16,7 @@
             <h1 v-if="showstatus"><span v-for="(item, index) in loading_text" :class="{ jump: jump_index == index }">{{
                     item }}</span></h1>
             <div v-if="!showstatus" class="status_form">
+                <div>注意第一次跑步必须手动运动,否则不会自动运动</div>
                 <div>
                     <span>是否每日自动运动</span>
                     <el-switch v-model="Canautopush_bol" :active-icon="Check" :inactive="Close" size="large"
@@ -250,6 +251,9 @@ h1 {
     padding: 1rem;
     border-radius: 2rem;
     display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
     justify-content: space-between;
 }
 
