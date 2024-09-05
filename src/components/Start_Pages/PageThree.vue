@@ -1,7 +1,9 @@
 <template>
     <div id="page">
         <div> 手动运动 </div>
-        <p style="font-size: 1.3rem;">该功能尚未完全完成,请<a href="#page5">添加微信</a>使用自动运动, 或使用旧版<br><a href="http://121.40.92.198:9090/run">http://121.40.92.198:9090</a>&nbsp<a href="http://121.40.92.198:9091/run">http://121.40.92.198:9091</a></p>
+        <p style="font-size: 1.3rem;">该功能尚未完全完成,请<a href="#page5">添加微信</a>使用自动运动, 或使用旧版<br><a
+                href="http://121.40.92.198:9090">http://121.40.92.198:9090</a>&nbsp<a
+                href="http://121.40.92.198:9091/run">http://121.40.92.198:9091</a></p>
         <div class="content">
             <div id="form" class="normalScroll">
                 <div class="fd">salt:<input class="U D block" type="text" name="salt" id="salt"
@@ -10,7 +12,7 @@
                         placeholder="访问学校服务器时的sign" v-model="sign" disabled></div>
                 <div class="fd">启用流(axios+xhr)
                     <!-- <input type="checkbox" v-model="able_stream"> -->
-                    <el-switch v-model="able_stream" :active-icon="Check" :inactive="Close"/>
+                    <el-switch v-model="able_stream" :active-icon="Check" :inactive="Close" />
                 </div>
                 <div class="fd">学号:<input class="H block" type="text" name="id" id="id" placeholder="学号"
                         th:value="${user_id}" v-model="userId" required></div>
@@ -28,7 +30,8 @@
                     <div class="userrecodelist">
                         <div v-for="(user_recodes, user_id, user_index) in runRecodes" :key="user_index"
                             style="width: 100%;">
-                            <p class="normalScroll" style="margin: 0; padding: 1em 0;">学号: {{ decodedUserId(user_id) }}</p>
+                            <p class="normalScroll" style="margin: 0; padding: 1em 0;">学号: {{ decodedUserId(user_id) }}
+                            </p>
                             <div style="overflow: auto; z-index: 9;">
                                 <table class="normalScroll RunRecodesAphonelist"
                                     style="width: 100%; border-collapse: collapse; scrollbar-width: none; -ms-overflow-style: none;"
@@ -54,7 +57,8 @@
                                             <td>{{ record.score }}</td>
                                             <td>{{ record.createTime }}</td>
                                             <td>{{ record.trueLength }}</td>
-                                            <td @click="usephoneInfo" style="cursor: pointer; color: blue;">{{ record.outphoneInfo }}</td>
+                                            <td @click="usephoneInfo" style="cursor: pointer; color: blue;">{{
+                                                record.outphoneInfo }}</td>
                                             <td>{{ record.userId }}</td>
                                             <td>{{ record.serverSpendTime }}</td>
                                         </tr>
@@ -90,8 +94,10 @@
                     </div>
                 </div>
                 <el-dialog v-model="showHistoryPhoneInfo" title="选择过往型号" class="normalScroll el-dialog" draggable>
-                    <div style="cursor: pointer;" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">⚡使用评分功能更新列表</div>
-                    <div style="cursor: pointer;" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">在评分列表点击要使用的手机型号即可</div>
+                    <div style="cursor: pointer;" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">
+                        ⚡使用评分功能更新列表</div>
+                    <div style="cursor: pointer;" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">
+                        在评分列表点击要使用的手机型号即可</div>
                 </el-dialog>
                 <div class="fd">手机型号:<input class="H block" type="text" name="phone" id="phone" v-model="phone"
                         placeholder="(Xiaomi M2011K2C/iPhone14,7)" required value="Xiaomi M2011K2C"></div>
@@ -132,11 +138,11 @@
                         value="1" disabled>
                 </div>
 
-                <div class="fd">路线节点间隔:<input class="block" type="number" id="nodespace"
-                        placeholder="点画:0,拖画:3,路线抗锯齿" onchange="nodespacechange()"></div>
+                <div class="fd">路线节点间隔:<input class="block" type="number" id="nodespace" placeholder="点画:0,拖画:3,路线抗锯齿"
+                        onchange="nodespacechange()"></div>
                 <div class="fd">节点合理化(仅对自画路线生效):
                     <!-- <input class="checkbox block" type="checkbox" id="pointconv" name="pointconv" checked> -->
-                    <el-switch v-model="pointconv" :active-icon="Check" :inactive="Close"/>
+                    <el-switch v-model="pointconv" :active-icon="Check" :inactive="Close" />
                 </div>
 
                 <div class="fd">地图类型:
@@ -166,10 +172,12 @@
                     </div>
                 </div>
                 <div id="mapcanvasdiv">
-                    <div v-if="selectedMapType == 'draw_mapType'" id="get4point">获取打卡点(不必要)<div id="get4pointres"></div></div>
+                    <div v-if="selectedMapType == 'draw_mapType'" id="get4point">获取打卡点(不必要)<div id="get4pointres"></div>
+                    </div>
                     <!-- 自画路线工具 -->
                     <div v-if="selectedMapType == 'draw_mapType'" id="draw_map_tools">
-                        <button v-bind="isNewStartPoint" @click="isNewStartPoint=!isNewStartPoint" :class="{'maptools_btn_active':isNewStartPoint, 'maptools_btn':!isNewStartPoint}">断点</button>
+                        <button v-bind="isNewStartPoint" @click="isNewStartPoint = !isNewStartPoint"
+                            :class="{ 'maptools_btn_active': isNewStartPoint, 'maptools_btn': !isNewStartPoint }">断点</button>
                         <button>撤回</button>
                         <button @click="clean_drawmap">清空</button>
                         <button>路线分段(未完成)</button>
@@ -179,10 +187,13 @@
                         <!-- <image id="testimg" th:src="@{/res/local_br.png}" src="../static/res/local_br.png" width="20px" style="left: 310.31583182445206px;top: 278.5985327600884px;"></image> -->
                     </div>
 
-                    <canvas v-if="selectedMapType == 'draw_mapType'" id="mapcanvasdivcan" class="mapcanvasdivcan" width="690" height="690" @mousedown="drawMouseDown($event)" @mousemove="drawMouseMove($event)" @mouseup="drawMouseUp($event)" @click="drawMouseClick($event)"></canvas>
-                    <textarea v-if="selectedMapType == 'write_mapType'" id="mapcanvasdivtext" class="D mapcanvasdivtext" name="mapdata"
-                        placeholder="自定义跑步json数据,此处文本会作为latLng的值"></textarea>
-                    <div v-if="selectedMapType == 'copy_mapType'" id="mapcanvasdivcan_js_div" width="100%" height="100%" style="display: flex;"></div>
+                    <canvas v-if="selectedMapType == 'draw_mapType'" id="mapcanvasdivcan" class="mapcanvasdivcan"
+                        width="690" height="690" @mousedown="drawMouseDown($event)" @mousemove="drawMouseMove($event)"
+                        @mouseup="drawMouseUp($event)" @click="drawMouseClick($event)"></canvas>
+                    <textarea v-if="selectedMapType == 'write_mapType'" id="mapcanvasdivtext" class="D mapcanvasdivtext"
+                        name="mapdata" placeholder="自定义跑步json数据,此处文本会作为latLng的值"></textarea>
+                    <div v-if="selectedMapType == 'copy_mapType'" id="mapcanvasdivcan_js_div" width="100%" height="100%"
+                        style="display: flex;"></div>
                 </div>
                 <div class="fd" id="subdata">完成运动</div>
             </div>
@@ -194,15 +205,15 @@
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import VueVirtualScroller from 'vue-virtual-scroller';
-import {Base64} from 'js-base64'
+import { Base64 } from 'js-base64'
 import { ElNotification } from 'element-plus';
 import { Check, Close } from '@element-plus/icons-vue'
 const baseHost = import.meta.env.VITE_WSN_SERVICE_URL
 axios.defaults.baseURL = import.meta.env.VITE_WSN_SERVICE_URL
 export default {
     components: {
-    VueVirtualScroller,
-  },
+        VueVirtualScroller,
+    },
     data() {
         return {
             salt: this.generateRandomHex(), // 初始值为随机生成的8位数
@@ -305,9 +316,9 @@ export default {
             UAOsModel: "",//安卓系统用于填写手机型号的一部分参数,这里是通过UA获取的,还有一部分是用户通过下拉框选择的
             UAOsVersion: "",//通过UA获取到的系统版本,苹果系统专有的参数
             mapType: [ // 地图类型
-                {name: "画出跑步路线", brand: "draw_mapType"},
-                {name: "自定义跑步json数据", brand: "write_mapType"},
-                {name: "提交学校服务器已存在的数据", brand: "copy_mapType"}
+                { name: "画出跑步路线", brand: "draw_mapType" },
+                { name: "自定义跑步json数据", brand: "write_mapType" },
+                { name: "提交学校服务器已存在的数据", brand: "copy_mapType" }
             ],
             selectedMapType: "draw_mapType", // 当前选择的地图类型
             // 自画地图相关
@@ -332,6 +343,10 @@ export default {
         console.log(this.updateDeviceModel());
         this.updateDeviceModel();
         this.updateHeader();
+        // 控制地图尺寸
+        this.$nextTick(() => {
+            this.setFixedSize();
+        });
     },
     computed: {
         // 计算属性, 地图相关
@@ -352,6 +367,19 @@ export default {
         },
     },
     methods: {
+        // 设置画板尺寸
+        setFixedSize() {
+            const mapCanvasDiv = this.$el.querySelector('#mapcanvasdiv');
+            if (mapCanvasDiv) {
+                console.log("Setting fixed size for mapCanvasDiv");
+                const computedWidth = Math.min(690, window.innerWidth * 0.9, window.innerHeight * 0.9) + 'px';
+                const computedHeight = Math.min(690, window.innerWidth * 0.9, window.innerHeight * 0.9) + 'px';
+                mapCanvasDiv.style.width = computedWidth;
+                mapCanvasDiv.style.height = computedHeight;
+            } else {
+                console.warn("Element #mapcanvasdiv not found.");
+            }
+        },
         // 通知
         ElNotification(title, message, type) {
             ElNotification({
@@ -362,7 +390,7 @@ export default {
         },
         // 解码用户id
         decodedUserId(id) {
-            if(id == "") {
+            if (id == "") {
                 return "";
             }
             return Base64.decode(id);
@@ -415,7 +443,7 @@ export default {
                 let match = userAgent.match(androidRegex)
                 model = 'Android'
                 this.Androidversion = match[1]
-                this.UAversion =  match[1]
+                this.UAversion = match[1]
                 this.UAOsModel = match[2].split(' ')[0].trim()
             } else if (/iPhone/.test(userAgent)) {
                 let match = userAgent.match(iosRegex)
@@ -440,7 +468,7 @@ export default {
             // 初始化时设置 sign
             this.updateSign();
             // 初始化时设置 useragent
-            this.useragent = DeviceMode == "iPhone" ? "RunWay/"+this.APPversion+" (iPhone; iOS "+ this.selectedBrandInput +"; Scale/3.00)" : this.default_useragent;
+            this.useragent = DeviceMode == "iPhone" ? "RunWay/" + this.APPversion + " (iPhone; iOS " + this.selectedBrandInput + "; Scale/3.00)" : this.default_useragent;
             // 初始化时设置 手机型号
         },
         // 在服务器获取历史型号, 过时的方法
@@ -465,17 +493,17 @@ export default {
             // console.log(event)
             let phoneInfo = event.target.innerText
             console.log(event.target.innerText)
-            if(phoneInfo == "") {
+            if (phoneInfo == "") {
                 this.ElNotification("提示", "该手机型号为空", "warning")
             }
-            if(phoneInfo.startsWith("android")) {
+            if (phoneInfo.startsWith("android")) {
                 // 分别是android_版本号_型号
                 let phoneInfo_list = phoneInfo.split('_')
                 this.selectedBrandInput = "来自历史型号"
                 this.UAversion = phoneInfo_list[1]
                 this.phone = phoneInfo_list[2]
                 this.useragent = this.default_useragent
-                this.ElNotification("成功选择手机型号", "已选择: 安卓 "+ phoneInfo_list[1] + " " + phoneInfo_list[2], "success")
+                this.ElNotification("成功选择手机型号", "已选择: 安卓 " + phoneInfo_list[1] + " " + phoneInfo_list[2], "success")
             } else {
                 this.ElNotification("提示", "目前仅支持安卓", "info")
             }
@@ -488,7 +516,7 @@ export default {
          * @param userid  用户id, 应确保放入列表的是string类型而不是int类型
          */
         getRunRecodesAphonelist(userid) {
-            if(this.getRunRecodesAphonelist_lock) {
+            if (this.getRunRecodesAphonelist_lock) {
                 alert("正在获取中，请稍后再试")
             }
             this.getRunRecodesAphonelist_lock = true;
@@ -551,30 +579,30 @@ export default {
          * 地图相关
          */
         // 更新自画地图
-        updateDrawMapInfo(){
+        updateDrawMapInfo() {
 
         },
         // 清空画板
-        clean_drawmap(){
+        clean_drawmap() {
             this.drawmap_list = []
             this.drawmap_list_temp = []
             this.isStartPosition = true
             this.isNewStartPoint = true
             this.updateDrawMapInfo() // 更新地图信息,待完成
         },
-        drawMouseDown(e){
+        drawMouseDown(e) {
             console.log("drawMouseDown")
             console.log(e)
         },
-        drawMouseMove(e){
+        drawMouseMove(e) {
             console.log("drawMouseMove")
             console.log(e)
         },
-        drawMouseUp(e){
+        drawMouseUp(e) {
             console.log("drawMouseUp")
             console.log(e)
         },
-        drawMouseClick(e){
+        drawMouseClick(e) {
             console.log("drawMouseClick，有Down，Move，Up事件就足够了，不需要该Click事件。")
             console.log(e)
         },
@@ -590,7 +618,7 @@ export default {
             this.UAversion = this.Androidversion
             this.phone = newValue + " " + this.UAOsModel
             this.useragent = this.default_useragent
-            if(newValue == "default") {
+            if (newValue == "default") {
                 this.phone = this.default_phone
             }
         },
@@ -599,8 +627,8 @@ export default {
             this.selectedBrandInput = newValue
             this.UAversion = this.APPversion
             this.phone = newValue
-            this.useragent = "RunWay/"+this.APPversion+" (iPhone; iOS "+ this.selectedBrandInput +"; Scale/3.00)"
-            if(newValue == "default") {
+            this.useragent = "RunWay/" + this.APPversion + " (iPhone; iOS " + this.selectedBrandInput + "; Scale/3.00)"
+            if (newValue == "default") {
                 this.phone = this.default_phone
             }
         }
@@ -780,8 +808,8 @@ export default {
 
 #mapcanvasdiv {
     position: relative;
-    width: min(690px, 90vw, 90vh);
-    height: min(690px, 90vw, 90vh);
+    /* width: min(690px, 90vw, 90vh);
+    height: min(690px, 90vw, 90vh); */
     /* width: 690px;
 	height: 690px; */
     /* max-width: 690px;
@@ -850,7 +878,7 @@ export default {
     color: #e74c3c;
 }
 
-#draw_map_tools{
+#draw_map_tools {
     z-index: 4;
     position: absolute;
     left: 0px;
@@ -943,7 +971,7 @@ export default {
     color: #fff;
 }
 
-.userrecodelist{
+.userrecodelist {
     width: 100%;
     max-height: 50vh;
     overflow: auto;
