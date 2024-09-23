@@ -16,7 +16,7 @@
             <h1 v-if="showstatus"><span v-for="(item, index) in loading_text" :class="{ jump: jump_index == index }">{{
                     item }}</span></h1>
             <div v-if="!showstatus" class="status_form">
-                <div>注意第一次跑步必须手动运动,否则不会自动运动</div>
+                <div>注意必须有至少一条跑步记录(可以手动刷步也可以真人跑步)才能自动运动,否则不会自动运动</div>
                 <div>
                     <span>是否每日自动运动</span>
                     <el-switch v-model="Canautopush_bol" :active-icon="Check" :inactive="Close" size="large"
@@ -138,7 +138,7 @@ const login_sub = () => {
     }).then(res => {
         if (res.data.code == 200) {
             // 登录成功
-            document.cookie = 'usercode=' + usercode.value
+            document.cookie = 'usercode=' + usercode.value + ';max-age=' + 60 * 60 * 24 * 30 * 6
             ElMessage.success('登录成功')
             for (let key in res.data.cookie) {
                 // 时间6个月

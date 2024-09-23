@@ -11,7 +11,37 @@
         <a href="#page4">其他产品</a>
         <a href="#page5">关于我们</a>
     </div>
+    <div class="animate__animated animate__bounceInRight" style="position: absolute; bottom: 0; right: 0; color: #6b798e; text-align: right; font-size: 1rem; user-select: none;">
+        <p>version: <br>wsnv in wsnv0.0.1<br>wsns in {{ wsns_version }}</p>
+        <p>require: wsns >= 0.0.2</p>
+    </div>
 </template>
+
+<script>
+import axios from 'axios'
+export default {
+    data() {
+        return {
+            wsns_version: '无法连接到wsns'
+        }
+    },
+    methods: {
+        getwsnsVersion() {
+            axios.get(import.meta.env.VITE_WSN_SERVICE_URL + '/version')
+                .then(res => {
+                    this.wsns_version = res.data
+                    // console.log(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+    },
+    mounted() {
+        this.getwsnsVersion()
+    }
+}
+</script>
 
 <style scoped>
 .animate__animated {

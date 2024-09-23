@@ -41,7 +41,6 @@ export default {
                 },
                 {
                     question: '联系方式?',
-                    answer: ['Github: https://github.com/xmexg', 'TG: https://t.me/mge0_0'],
                     image: '/wechat.jpg'
                 },
                 {
@@ -50,7 +49,7 @@ export default {
                 },
                 {
                     question: '为什么收费?',
-                    answer: 'wsb起初免费,代码开源,且在软件里注明了源码地址,是想让校友们共同学习,一起对抗校园跑,但被学生在csdn、贴吧、QQ、微信收费倒卖,遂在0.0.7版本起不公开收费。早期版本至今仍可在 https://github.com/xmexg/wkyd 免费获取。'
+                    answer: 'wsb起初免费,代码开源,且在软件里注明了源码地址,是想让校友们共同学习,一起对抗校园跑,但被学生在csdn、贴吧、QQ、微信收费倒卖,遂在0.0.7版本起不公开收费。早期版本至今仍可在 https://github.com/xmexg/wkyd 免费获取。(因不可抗拒原因于2024年9月3日已闭源)'
                 },
                 {
                     question: '机刷靠谱吗?',

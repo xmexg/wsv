@@ -1,6 +1,6 @@
 {
   "name": "next_wkyd",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,6 +12,7 @@
     "animate.css": "^4.1.1",
     "axios": "^1.7.4",
     "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "element-plus": "^2.8.0",
     "jquery": "^3.7.1",
