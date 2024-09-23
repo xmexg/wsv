@@ -933,7 +933,10 @@ export default {
             deep: true
         },
         el_chooseMap(newValue){
-            console.log(newValue)
+            if(newValue){
+                this.$nextTick
+                // 获取
+            }
         }
     }
 }
