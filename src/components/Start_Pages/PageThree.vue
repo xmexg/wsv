@@ -67,7 +67,7 @@
                             <img src="/wkmap.jpg" width="345" height="345" class="choose_serMap_img">
                             <canvas class="choose_serMap_cav" :id="'canvas_' + encode_base(recode.runId)"></canvas>
                             <p class="choose_serMap_p">{{ recode.createTime }} {{ recode.outphoneInfo }}</p>
-                            <el-button @click="setMapData(recode.markList)" class="choose_serMap_btn">选择</el-button>
+                            <el-button @click="setMapData(recode)" class="choose_serMap_btn">选择</el-button>
                         </div>
                     </div>
                 </el-dialog>
@@ -176,12 +176,11 @@
                     <div v-if="selectedMapType == 'draw_mapType'" id="get4point" @click="get4point">获取打卡点(没用的功能)<div id="get4pointres"></div></div>
                     <!-- 自画路线工具 -->
                     <div v-if="selectedMapType == 'draw_mapType'" id="draw_map_tools">
-                        <button v-bind="isNewStartPoint" @click="isNewStartPoint = !isNewStartPoint"
-                            :class="{ 'maptools_btn_active': isNewStartPoint, 'draw_map_tools_button': !isNewStartPoint }" class="draw_map_tools_button">断点</button>
+                        <button v-bind="isNewStartPoint" @click="isNewStartPoint = !isNewStartPoint" :class="{ 'maptools_btn_active': isNewStartPoint, 'draw_map_tools_button': !isNewStartPoint }" class="draw_map_tools_button">断点</button>
                         <button @click="retract_drawmap" class="draw_map_tools_button">撤回</button>
                         <button @click="clean_drawmap" class="draw_map_tools_button">清空</button>
                         <button @click="enableClickEvent = !enableClickEvent" :class="{ 'maptools_btn_active': enableClickEvent, 'draw_map_tools_button': !enableClickEvent }" class="draw_map_tools_button">启用点击<br>注意节点间隔</button>
-                        <button class="draw_map_tools_button">路线分段(未完成)</button>
+                        <!-- <button class="draw_map_tools_button">路线分段(未完成)</button> -->
                     </div>
                     <!-- 在画板顶层放置一个隐形的div,用于放置一些标记 -->
                     <div v-if="selectedMapType == 'draw_mapType'" id="canvasTOP">
@@ -795,10 +794,13 @@ export default {
             return Math.sqrt(Math.pow((nowX - preX), 2) + Math.pow((nowY - preY), 2)) * this.GeoPixel
         },
         calLtoXY_half(longitude, latitude){
+            console.log("全分比率: RatioX", this.RatioX, "  RatioY", this.RatioY)
+            console.log("半分比率: RatioX_half", this.RatioX_half, "  RatioY_half", this.RatioY_half)
             let ituse = {
                 x: (longitude - this.OriginSX) / this.RatioX_half,
                 y: (latitude - this.OriginSY) / this.RatioY_half
             }
+            console.log("原点: OriginSX", this.OriginSX, "  OriginSY", this.OriginSY, " 物理偏移: x", longitude - this.OriginSX, " y", latitude - this.OriginSY, "画板偏移: x",ituse.x," y",ituse.y)
             return ituse;
         },
         // 自画路线获取打卡点位置
@@ -863,8 +865,33 @@ export default {
         subdata_copy_mapType(){
             console.log("提交学校服务器已存在的数据")
         },
-        setMapData(){
-
+        // 选择服务器地图数据
+        setMapData(recode){
+            this.ElNotification("提示", "选择了服务器地图数据", "info")
+        },
+        // 显示服务器跑步数据, 画出地图路线
+        drawserMap(canvasId, recode){
+            console.log("画地图", canvasId, recode.runId)
+            const canvas = document.getElementById(canvasId)
+            const ctx = canvas.getContext('2d')
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.beginPath()
+            ctx.strokeStyle = 'green'
+            const markList_json = JSON.parse(recode.markList)
+            markList_json.forEach((mark, index) => {
+                console.log("转换前坐标", mark)
+                const xyhalf = this.calLtoXY_half(mark.latLng.longitude, mark.latLng.latitude)
+                console.log("转换后坐标", xyhalf)
+                if(index == 0){
+                    ctx.moveTo(xyhalf.x, xyhalf.y)
+                } else if (mark.isStartPosition){
+                    ctx.stroke()
+                    ctx.moveTo(xyhalf.x, xyhalf.y)
+                } else {
+                    ctx.lineTo(xyhalf.x, xyhalf.y)
+                }
+            })
+            ctx.stroke()
         }
     },
     watch: {
@@ -934,8 +961,23 @@ export default {
         },
         el_chooseMap(newValue){
             if(newValue){
-                this.$nextTick
-                // 获取
+                // 调用drawMap方法更新canvas
+                this.$nextTick(() => {
+                    const recodes = this.runRecodes[this.el_chooseMapUserid];
+                    console.log(recodes)
+                    if (recodes && recodes.length > 0) {
+                        console.log("开始绘制地图")
+                        this.$nextTick(() => {
+                            console.log("记录数: ", recodes.length)
+                            this.drawserMap('canvas_' + this.encode_base(recodes[0].runId), recodes[0])
+                            // recodes.forEach(recode => {
+                            //     const canvasId = 'canvas_' + this.encode_base(recode.runId);
+                            //     // 确保DOM更新完成后调用绘制函数
+                            //     this.drawserMap(canvasId, recode);
+                            // });
+                        });
+                    }
+                })
             }
         }
     }

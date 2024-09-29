@@ -6,6 +6,12 @@
             <div id="product">
                 <div><a href="http://121.40.92.198:9090">旧版wkyd</a></div>
                 <div><a :href="`${service}/run`">wsn(springboot)内置wkyd</a></div>
+                <div>
+                    <input type="number" placeholder="Xlong经度" v-model="inputx">
+                    <input type="number" placeholder="Ylant经度" v-model="inputy">
+                    <input type="button" @click="calLtoxy">
+                    <p>{{ out }}</p>
+                </div>
                 <!-- <div>学习强国</div>
                 <div>图片ai换脸</div>
                 <div>视频ai换脸</div>
@@ -20,11 +26,47 @@ import axios from "axios";
 export default {
     data() {
         return {
-            service: import.meta.env.VITE_WSN_SERVICE_URL
+            service: import.meta.env.VITE_WSN_SERVICE_URL,
+            canvasWidth: 690,//画布宽度
+            canvasHeight: 690,//画布高度
+            OriginSX: 118.766916,//原点经度坐标
+            OriginSY: 36.891086,//原点纬度坐标
+            OriginEX: 118.781829,//对点经度坐标
+            OriginEY: 36.879227,//对点纬度坐标
+            inputx: 0,
+            inputy: 0,
+            out: {
+                x: 0,
+                y: 0
+            },
         };
     },
+    computed: {
+        RatioX() {
+            return (this.OriginEX - this.OriginSX) / this.canvasWidth;
+        },
+        RatioY() {
+            return (this.OriginEY - this.OriginSY) / this.canvasHeight;
+        },
+        RatioX_half() {
+            return (this.OriginEX - this.OriginSX) / (this.canvasWidth / 2);
+        },
+        RatioY_half() {
+            return (this.OriginEY - this.OriginSY) / (this.canvasHeight / 2);
+        }
+    },
     methods: {
-        
+        calLtoxy() {
+            console.log("全分比率: RatioX", this.RatioX, "  RatioY", this.RatioY)
+            console.log("半分比率: RatioX_half", this.RatioX_half, "  RatioY_half", this.RatioY_half)
+            let ituse = {
+                x: (this.inputx - this.OriginSX) / this.RatioX_half,
+                y: (this.inputy - this.OriginSY) / this.RatioY_half
+            }
+            console.log("原点: OriginSX", this.OriginSX, "  OriginSY", this.OriginSY, " 物理偏移: x", this.inputx - this.OriginSX, " y", this.inputy - this.OriginSY, "画板偏移: x", ituse.x, " y", ituse.y)
+            this.out = ituse;
+            return ituse;
+        }
     },
 };
 </script>
