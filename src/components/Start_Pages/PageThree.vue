@@ -65,7 +65,8 @@
                     <div  class="el_chooseMap">
                         <div v-for="(recode, index) in runRecodes[el_chooseMapUserid]" :key="el_chooseMapUserid" class="choose_serMap">
                             <img src="/wkmap.jpg" width="345" height="345" class="choose_serMap_img">
-                            <canvas class="choose_serMap_cav" :id="'canvas_' + encode_base(recode.runId)"></canvas>
+                            <!-- 画板尺寸坑 -->
+                            <canvas class="choose_serMap_cav" :id="'canvas_' + encode_base(recode.runId)" width="345px" height="345px"></canvas>
                             <p class="choose_serMap_p">{{ recode.createTime }} {{ recode.outphoneInfo }}</p>
                             <el-button @click="setMapData(recode)" class="choose_serMap_btn">选择</el-button>
                         </div>
@@ -189,7 +190,17 @@
 
                     <canvas v-if="selectedMapType == 'draw_mapType'" id="mapcanvasdivcan" class="mapcanvasdivcan" width="690" height="690" @mousedown="drawMouseDown($event)" @mousemove="drawMouseMove($event)" @mouseup="drawMouseUp($event)" @click="drawMouseClick($event)"></canvas>
                     <textarea v-if="selectedMapType == 'write_mapType'" id="mapcanvasdivtext" class="D mapcanvasdivtext" name="mapdata" placeholder="自定义跑步json数据,此处文本会作为latLng的值"></textarea>
-                    <div v-if="selectedMapType == 'copy_mapType'" id="mapcanvasdivcan_js_div" width="100%" height="100%" style="display: flex;"></div>
+                    <div v-if="selectedMapType == 'copy_mapType'" id="mapcanvasdivcan_js_div" width="100%" height="100%" style="display: flex;" class="copy_mapType_div">
+                        <div v-if="selected_recode.length==0">
+                            <div @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">使用"查看跑步评分 & 更新手机型号"功能选择服务器端地图</div>
+                        </div>
+                        <div v-else class="copy_mapType_div_show">
+                            <img class="copy_mapType_div_show_img" src="/wkmap.jpg" width="690" height="690">
+                            <!-- 画板尺寸坑 -->
+                            <canvas id="canvas_selected" class="copy_mapType_div_show_canvas" width="690" height="690"></canvas>
+                            <p>详情占位符</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="fd" id="subdata" @click="subdata">完成运动</div>
             </div>
@@ -325,6 +336,7 @@ export default {
             // 选择服务器地图相关
             el_chooseMap: false, // 是否显示服务器地图
             el_chooseMapUserid: "", // 当前选择的学号
+            selected_recode: "", // 已选择的服务器端数据
             // 自画地图相关
             thecanvas: null, //画板,在组件挂载后初始化
             isStartPosition: true, // 是否是起始点
@@ -346,6 +358,7 @@ export default {
             OriginEX: 118.781829,//对点经度坐标
             OriginEY: 36.879227,//对点纬度坐标
             GeoW: 1250,//地图地理宽度(cm)
+            GeoH: 1250,//地图地理高度(cm)
         };
     },
     mounted() {
@@ -394,7 +407,7 @@ export default {
         },
         GeoPixel_half() {
             return this.GeoW / ( this.canvasWidth / 2 ); //地图像素点长度的一半
-        },
+        }
     },
     methods: {
         // 设置画板尺寸
@@ -660,7 +673,7 @@ export default {
         drawMouseMove(e) {
             // 如果没有按下鼠标, 就直接忽略
             if (!this.drawmap_can_recode) return
-            console.log(this.nodespace)
+            // console.log(this.nodespace)
             if  (this.nodespace == '') this.nodespace = 0
             // latitude -> Y, longitude -> X
             let preX, preY
@@ -794,14 +807,57 @@ export default {
             return Math.sqrt(Math.pow((nowX - preX), 2) + Math.pow((nowY - preY), 2)) * this.GeoPixel
         },
         calLtoXY_half(longitude, latitude){
-            console.log("全分比率: RatioX", this.RatioX, "  RatioY", this.RatioY)
-            console.log("半分比率: RatioX_half", this.RatioX_half, "  RatioY_half", this.RatioY_half)
             let ituse = {
                 x: (longitude - this.OriginSX) / this.RatioX_half,
                 y: (latitude - this.OriginSY) / this.RatioY_half
             }
-            console.log("原点: OriginSX", this.OriginSX, "  OriginSY", this.OriginSY, " 物理偏移: x", longitude - this.OriginSX, " y", latitude - this.OriginSY, "画板偏移: x",ituse.x," y",ituse.y)
             return ituse;
+        },
+        // 自定义尺寸的, 通过传入画板宽度和高度计算坐标,将画板坐标转换为地图坐标
+        calXYtoL_custom(X, Y, width, height){
+            let ituse = {
+                x: X * (this.OriginW / width) + this.OriginSX,
+                y: Y * (this.OriginH / height) + this.OriginSY
+            }
+            return ituse;
+        },
+        // 自定义尺寸的, 通过传入画板宽度和高度计算坐标,将地图坐标转换为画板坐标
+        calLtoXY_custom(longitude, latitude, width, height){
+            let ituse = {
+                x: (longitude - this.OriginSX) / (this.OriginW / width),
+                y: (latitude - this.OriginSY) / (this.OriginH / height)
+            }
+            return ituse;
+        },
+        // 自定义尺寸的, 通过传入画板宽度和高度计算坐标, 勾股定理计算两点之间的物理距离
+        calGeolen_custom_w(preX, preY, nowX, nowY, width, height){
+            if(preX == nowX && preY == nowY) return 0
+            if(preX == nowX) return Math.abs(nowY - preY) * (this.GeoW / width)
+            if(preY == nowY) return Math.abs(nowX - preX) * (this.GeoH / height)
+            return Math.sqrt(Math.pow((nowX - preX), 2) + Math.pow((nowY - preY), 2)) * Math.sqrt(Math.pow(this.GeoW / width, 2) + Math.pow(this.GeoH / height, 2))
+        },
+        // 传入比率的, 自定义尺寸的, 通过传入画板宽度和高度计算坐标,将画板坐标转换为地图坐标
+        calXYtoL_custom(X, Y, RatioX, RatioY, OriginSX, OriginSY){
+            let ituse = {
+                x: X * RatioX + OriginSX,
+                y: Y * RatioY + OriginSY
+            }
+            return ituse;
+        },
+        // 传入比率的, 自定义尺寸的, 通过传入画板宽度和高度计算坐标,将地图坐标转换为画板坐标
+        calLtoXY_custom(longitude, latitude, RatioX, RatioY, OriginSX, OriginSY){
+            let ituse = {
+                x: (longitude - OriginSX) / RatioX,
+                y: (latitude - OriginSY) / RatioY
+            }
+            return ituse;
+        },
+        // 传入比率的, 自定义尺寸的, 通过传入画板宽度和高度计算坐标, 勾股定理计算两点之间的物理距离
+        calGeolen_custom_R(preX, preY, nowX, nowY, RatioX, RatioY){
+            if(preX == nowX && preY == nowY) return 0
+            if(preX == nowX) return Math.abs(nowY - preY) * RatioY
+            if(preY == nowY) return Math.abs(nowX - preX) * RatioX
+            return Math.sqrt(Math.pow((nowX - preX), 2) + Math.pow((nowY - preY), 2)) * Math.sqrt(Math.pow(RatioX, 2) + Math.pow(RatioY, 2))
         },
         // 自画路线获取打卡点位置
         get4point(){
@@ -867,28 +923,33 @@ export default {
         },
         // 选择服务器地图数据
         setMapData(recode){
-            this.ElNotification("提示", "选择了服务器地图数据", "info")
+            this.selectedMapType = "copy_mapType"
+            this.selected_recode = recode
+            this.ElNotification("成功", "选择了服务器地图数据", "success")
+            console.log(recode)
         },
         // 显示服务器跑步数据, 画出地图路线
         drawserMap(canvasId, recode){
-            console.log("画地图", canvasId, recode.runId)
+            // console.log("画地图", canvasId, recode.runId)
             const canvas = document.getElementById(canvasId)
+            const RatioX = this.OriginW / canvas.width
+            const RatioY = this.OriginH / canvas.height
             const ctx = canvas.getContext('2d')
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.beginPath()
             ctx.strokeStyle = 'green'
             const markList_json = JSON.parse(recode.markList)
             markList_json.forEach((mark, index) => {
-                console.log("转换前坐标", mark)
-                const xyhalf = this.calLtoXY_half(mark.latLng.longitude, mark.latLng.latitude)
-                console.log("转换后坐标", xyhalf)
+                // const xyhalf = this.calLtoXY_half(mark.latLng.longitude, mark.latLng.latitude)
+                // 使用calLtoXY_custom
+                const xy = this.calLtoXY_custom(mark.latLng.longitude, mark.latLng.latitude, RatioX, RatioY, this.OriginSX, this.OriginSY)
                 if(index == 0){
-                    ctx.moveTo(xyhalf.x, xyhalf.y)
+                    ctx.moveTo(xy.x, xy.y)
                 } else if (mark.isStartPosition){
                     ctx.stroke()
-                    ctx.moveTo(xyhalf.x, xyhalf.y)
+                    ctx.moveTo(xy.x, xy.y)
                 } else {
-                    ctx.lineTo(xyhalf.x, xyhalf.y)
+                    ctx.lineTo(xy.x, xy.y)
                 }
             })
             ctx.stroke()
@@ -966,18 +1027,35 @@ export default {
                     const recodes = this.runRecodes[this.el_chooseMapUserid];
                     console.log(recodes)
                     if (recodes && recodes.length > 0) {
-                        console.log("开始绘制地图")
+                        // console.log("开始绘制地图")
                         this.$nextTick(() => {
-                            console.log("记录数: ", recodes.length)
-                            this.drawserMap('canvas_' + this.encode_base(recodes[0].runId), recodes[0])
-                            // recodes.forEach(recode => {
-                            //     const canvasId = 'canvas_' + this.encode_base(recode.runId);
-                            //     // 确保DOM更新完成后调用绘制函数
-                            //     this.drawserMap(canvasId, recode);
-                            // });
+                            recodes.forEach(recode => {
+                                const canvasId = 'canvas_' + this.encode_base(recode.runId);
+                                // 确保DOM更新完成后调用绘制函数
+                                this.drawserMap(canvasId, recode);
+                            });
                         });
                     }
                 })
+            }
+        },
+        selectedMapType(new_selectedMapType){
+            if(new_selectedMapType == "draw_mapType"){
+                this.$nextTick(() => {
+                    this.thecanvas = document.getElementById("mapcanvasdivcan").getContext("2d")
+                    this.draw_drawmap_list_canvas()
+                })
+            }
+            if(new_selectedMapType == "copy_mapType"){
+                if(this.selected_recode){
+                    console.log("绘制已选择的服务器端地图")
+                    if(this.totalGeoLength_lock){
+                        this.totalGeoLength = this.selected_recode.trueLength
+                    }
+                    this.$nextTick(() => {
+                        this.drawserMap('canvas_selected', this.selected_recode)
+                    })
+                }
             }
         }
     }
@@ -985,6 +1063,10 @@ export default {
 </script>
 
 <style scoped>
+.hiddendiv {
+    visibility: hidden;
+}
+
 #page {
     display: flex;
     align-items: center;
@@ -1388,5 +1470,27 @@ export default {
     position: absolute;
     bottom: 0;
     right: 0;
+}
+
+.copy_mapType_div{
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+.copy_mapType_div_show{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.copy_mapType_div_show_img{
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.copy_mapType_div_show_canvas{
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 </style>
