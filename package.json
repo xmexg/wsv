@@ -1,12 +1,14 @@
 {
   "name": "next_wkyd",
   "version": "0.0.1",
+  "homepage": "https://github.com/xmexg/wsv",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "animate.css": "^4.1.1",
@@ -15,6 +17,7 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
     "element-plus": "^2.8.0",
+    "gh-pages": "^6.1.1",
     "jquery": "^3.7.1",
     "js-base64": "^3.7.7",
     "moment": "^2.30.1",

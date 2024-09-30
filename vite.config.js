@@ -5,6 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: 'wsv', // github仓库名, github page需要加仓库路径访问
   plugins: [
     vue(),
   ],
