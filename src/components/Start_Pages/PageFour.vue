@@ -6,12 +6,12 @@
             <div id="product">
                 <div><a href="http://121.40.92.198:9090">旧版wkyd</a></div>
                 <div><a :href="`${service}/run`">wsn(springboot)内置wkyd</a></div>
-                <div>
+                <!-- <div>
                     <input type="number" placeholder="Xlong经度" v-model="inputx">
                     <input type="number" placeholder="Ylant经度" v-model="inputy">
                     <input type="button" @click="calLtoxy">
                     <p>{{ out }}</p>
-                </div>
+                </div> -->
                 <!-- <div>学习强国</div>
                 <div>图片ai换脸</div>
                 <div>视频ai换脸</div>

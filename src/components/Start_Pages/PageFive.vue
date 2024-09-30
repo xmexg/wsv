@@ -33,7 +33,7 @@ export default {
                 },
                 {
                     question: '这是什么项目?',
-                    answer: '一个某学院自动运动的项目,是wsb的后续版本,我叫它wsn,这包含前端和后端两部分,分别是wsn(vite)和wsn(springboot),其中wsn(vite)是开源的(自2024年9月3日起由于不可抗拒原因已闭源),位于https://github.com/xmexg/wsv'
+                    answer: '一个某学院自动运动的项目,是wsb(wkyd别名)的后续版本,我叫它wsn,这包含前端和后端两部分,分别是wsn(vite)和wsn(springboot),其中wsn(vite)是开源的,位于https://github.com/xmexg/wsv ,wsb起初也是开源的,自2024年9月3日起由于不可抗拒原因已闭源'
                 },
                 {
                     question: '这个项目和wsb是同一开发者吗?',

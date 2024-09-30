@@ -1,9 +1,9 @@
 <template>
     <div id="page">
         <div> 手动运动 </div>
-        <p style="font-size: 1.3rem;">该功能尚未完全完成,请<a href="#page5">添加微信</a>使用自动运动, 或使用旧版<br><a
+        <!-- <p style="font-size: 1.3rem;">该功能尚未完全完成,请<a href="#page5">添加微信</a>使用自动运动, 或使用旧版<br><a
                 href="http://121.40.92.198:9090">http://121.40.92.198:9090</a>&nbsp<a
-                href="http://121.40.92.198:9091/run">http://121.40.92.198:9091</a></p>
+                href="http://121.40.92.198:9091/run">http://121.40.92.198:9091</a></p> -->
         <div class="content">
             <div id="form" class="normalScroll">
                 <div class="fd">salt:<input class="U D block" type="text" name="salt" id="salt"
@@ -137,7 +137,7 @@
                 <div class="fd">结束时间:<input class="block" type="datetime-local" v-model="endTime" id="endTime" step="1"
                         placeholder="结束时间(2023-03-16 11:15:40)"></div>
                 <div class="fd">校区:<input class="D block" type="text" name="campus" id="campus" placeholder="校区(1)"
-                        value="1" disabled>
+                        value="1" v-model="campus" disabled>
                 </div>
 
                 <div class="fd">节点间隔(点画务必为0):<input class="block" type="number" id="nodespace" placeholder="点画:0,拖画:3,路线抗锯齿"
@@ -189,7 +189,7 @@
                     </div>
 
                     <canvas v-if="selectedMapType == 'draw_mapType'" id="mapcanvasdivcan" class="mapcanvasdivcan" width="690" height="690" @mousedown="drawMouseDown($event)" @mousemove="drawMouseMove($event)" @mouseup="drawMouseUp($event)" @click="drawMouseClick($event)"></canvas>
-                    <textarea v-if="selectedMapType == 'write_mapType'" id="mapcanvasdivtext" class="D mapcanvasdivtext" name="mapdata" placeholder="自定义跑步json数据,此处文本会作为latLng的值"></textarea>
+                    <textarea v-if="selectedMapType == 'write_mapType'" id="mapcanvasdivtext" class="D mapcanvasdivtext" name="mapdata" v-model="write_markList" placeholder="自定义跑步json数据,此处文本会作为latLng的值"></textarea>
                     <div v-if="selectedMapType == 'copy_mapType'" id="mapcanvasdivcan_js_div" width="100%" height="100%" style="display: flex;" class="copy_mapType_div">
                         <div v-if="selected_recode.length==0">
                             <div @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">使用"查看跑步评分 & 更新手机型号"功能选择服务器端地图</div>
@@ -217,7 +217,6 @@ import { ElNotification, translate } from 'element-plus';
 import { toRaw } from 'vue'
 import dayjs from 'dayjs'
 
-const baseHost = import.meta.env.VITE_WSN_SERVICE_URL
 axios.defaults.baseURL = import.meta.env.VITE_WSN_SERVICE_URL
 export default {
     components: {
@@ -327,6 +326,7 @@ export default {
             UAOsModel: "",//安卓系统用于填写手机型号的一部分参数,这里是通过UA获取的,还有一部分是用户通过下拉框选择的
             UAOsVersion: "",//通过UA获取到的系统版本,苹果系统专有的参数
             ostype: "android",//系统类型,安卓填写android,苹果填写iOS
+            campus: "1",//校区,默认为1
             mapType: [ // 地图类型
                 { name: "画出跑步路线", brand: "draw_mapType" },
                 { name: "自定义跑步json数据", brand: "write_mapType" },
@@ -349,6 +349,8 @@ export default {
             Geolen_temp: 0, // 正在绘制的地图物理距离
             nodespace: 0, // 节点间隔
             nownodespace: 0, // 当前节点间隔
+            // 自定义地图相关
+            write_markList: "", // 自定义地图数据
             // 来自wkyd_dbshow
             // 画板参数相关
             canvasWidth: 690,//画布宽度
@@ -379,8 +381,13 @@ export default {
         // 设置开始时间和结束时间, 结束时间是当前时间, 开始时间是当前时间早28分钟, 精确到秒
         const date = new Date()
         this.endTime = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
-        this.beginTime = dayjs(date.getTime() - ((Math.floor(Math.random() * 121) + 1620) * 1000)).format('YYYY-MM-DDTHH:mm:ss');
+        
+        // 随机生成 1620 到 1740 秒（27 到 29 分钟）的时间差
+        const randomSeconds = Math.floor(Math.random() * 121) + 1620; // 随机 1620 到 1740 秒
+        const randomMilliseconds = randomSeconds * 1000; // 转换为毫秒
 
+        // 确保 date 是正确的 Date 类型或转换成时间戳后处理
+        this.beginTime = dayjs(date.valueOf() - randomMilliseconds).format('YYYY-MM-DDTHH:mm:ss');
     },
     computed: {
         // 计算属性, 地图相关
@@ -596,6 +603,7 @@ export default {
             let userid_base64 = Base64.encode(userid);
             this.runRecodes[userid_base64] = [];
             let reslen = 0;
+            let temp_runRecodes = "" // 传输中不完整的数据
             if (this.able_stream) { // 启用流
                 axios.post('/webapi/dfdetection_Stream', {
                     userId: userid,
@@ -605,13 +613,29 @@ export default {
                     onDownloadProgress: progressEvent => {
                         const xhr = progressEvent.event.target
                         const { responseText } = xhr
-                        console.log("=====responseText====== old:" + reslen + " add:" + responseText.length)
+                        console.log("=====responseText====== old:" + reslen + " new:" + responseText.length)
                         // 截取字符串，输出新增加的部分
                         let addpart = responseText.substring(reslen, responseText.length)
                         reslen = responseText.length // 必须赶在下次获取到数据前执行
-                        let addaprt_split = addpart.trim().split("\n")
+                        // console.log(addpart)
+                        if (addpart.length == 0) {
+                            return;
+                        }
+                        addpart = temp_runRecodes + addpart // 把之前的不完整数据加上
+                        // 每个空字符都可能是有用的, 禁止trim
+                        if (!addpart.endsWith("\n")) {
+                            // 获取从最后一个换行符到最后的字符串, 如果找不到换行符, 就是整个字符串
+                            let lastLineBreak = addpart.lastIndexOf("\n") // 最后一个换行符,找不到就是-1
+                            temp_runRecodes = addpart.substring(lastLineBreak + 1, addpart.length)
+                            addpart = addpart.substring(0, lastLineBreak)
+                        } else {
+                            temp_runRecodes = "" // 如果是换行符结尾, 就清空temp_runRecodes
+                        }
+                        let addaprt_split = addpart.split("\n")
                         addaprt_split.forEach(element => {
-                            this.runRecodes[userid_base64].push(JSON.parse(element))
+                            if (element.length > 0){
+                                this.runRecodes[userid_base64].push(JSON.parse(element))
+                            }
                         });
                     }
                 }).then(response => { // 全部完成时
@@ -630,18 +654,14 @@ export default {
                     salt: this.salt,
                     sign: this.sign
                 }).then(res => {
-                    this.getRunRecodesAphonelist_lock = false;
-                    console.log(res.data);
                     let responseText = res.data;
-                    //如果返回的数据是空的，就不用处理了
-                    if (responseText.length == 0) {
+                    // 如果返回的数据是空数组，直接返回
+                    if (responseText.length === 0) {
                         return;
                     }
-                    let addaprt_split = responseText.trim().split("\n")
-                    console.log(addaprt_split)
-                    addaprt_split.forEach(element => {
-                        this.runRecodes[userid_base64].push(JSON.parse(element))
-                    });
+                    // 将整个数组直接推入到 this.runRecodes[userid_base64] 中
+                    this.runRecodes[userid_base64].push(...responseText);
+                    this.getRunRecodesAphonelist_lock = false;
                 }).catch(err => {
                     console.error(err);
                     this.getRunRecodesAphonelist_lock = false;
@@ -653,7 +673,7 @@ export default {
          */
         // 更新自画地图
         updateDrawMapInfo() {
-
+            // 忘了要干什么
         },
         // 清空画板
         clean_drawmap() {
@@ -673,7 +693,6 @@ export default {
         drawMouseMove(e) {
             // 如果没有按下鼠标, 就直接忽略
             if (!this.drawmap_can_recode) return
-            // console.log(this.nodespace)
             if  (this.nodespace == '') this.nodespace = 0
             // latitude -> Y, longitude -> X
             let preX, preY
@@ -897,36 +916,77 @@ export default {
                 console.error(err)
             })
         },
-        subdata(){
-            switch(this.selectedMapType){
-                case "draw_mapType":
-                    this.subdata_draw_mapType()
-                    break
-                case "write_mapType":
-                    this.subdata_write_mapType()
-                    break
-                case "copy_mapType":
-                    this.subdata_copy_mapType()
-                    break
+        MAKE_HEAD(){
+            if(this.ostype == 'iOS'){
+                return {"X-Re-Os": this.ostype, "X-Re-Version": this.UAversion, "X-Re-Device": this.phone, "User-Agent": this.useragent, "X-Re-OsVersion": this.UAOsVersion}
+            } else {
+                return {"X-Re-Os": this.ostype, "X-Re-Version": this.UAversion, "X-Re-Device": this.phone, "User-Agent": this.useragent}
             }
         },
-        subdata_draw_mapType(){
-            console.log("提交自画地图")
-            console.log(this.drawmap_list_canvas)
-            console.log(this.Geolen_canvas)
+        MAKE_BODY(markList){
+            return {
+                "beginTime": this.beginTime.replace("T", " "),
+                "endTime": this.endTime.replace("T", " "),
+                "campus": this.campus.toString(),
+                "markList": JSON.stringify(markList),
+                "totalLength": this.totalGeoLength.toString(),
+                "totalTime": this.totalTimeLength.toString(),
+                "userCode": this.userId.toString()
+            }
         },
-        subdata_write_mapType(){
-            console.log("提交自定义json数据")
+        MAKE_RECORD(markList){
+            return JSON.stringify({"HEAD": this.MAKE_HEAD(), "BODY": this.MAKE_BODY(markList)})
         },
-        subdata_copy_mapType(){
-            console.log("提交学校服务器已存在的数据")
+        subdata(){
+            let make_record = ""
+            switch(this.selectedMapType){
+                case "draw_mapType":
+                    let markList = []
+                    this.drawmap_list_canvas.forEach((blockarray, blockindex) => {
+                        blockarray.forEach((value, index) => {
+                            const L = this.calXYtoL(value.latLng.Xlongitude, value.latLng.Ylatitude)
+                            if(value.isStartPosition){
+                                markList.push({"isStartPosition": true, "latLng": {"latitude": L.y, "longitude": L.x}})
+                            } else {
+                                markList.push({"latLng": {"latitude": L.y, "longitude": L.x}})
+                            }
+                        })
+                    })
+                    make_record = this.MAKE_RECORD(markList)
+                    break
+                case "write_mapType":
+                    make_record = this.MAKE_RECORD(this.write_map)
+                    break
+                case "copy_mapType":
+                    make_record = this.MAKE_RECORD(this.selected_recode.markList)
+                    break
+            }
+            // console.log(make_record)
+            axios.post(`/api/run/addRunInfoByUserId?salt=${this.salt}&sign=${this.sign}`, 
+                make_record, 
+                {
+                    headers: {
+                        'Content-Type': 'application/json;charset=UTF-8'
+                    }
+                }
+            ).then(res => {
+                console.log(res.data)
+                if(res.data.code == 1){
+                    this.ElNotification("成功", "跑步成功", "success")
+                } else {
+                    this.ElNotification("失败", res.data, "error")
+                }
+            }).catch(err => {
+                console.error(err)
+                this.ElNotification("失败", "跑步失败", "error")
+            })
         },
         // 选择服务器地图数据
         setMapData(recode){
             this.selectedMapType = "copy_mapType"
             this.selected_recode = recode
             this.ElNotification("成功", "选择了服务器地图数据", "success")
-            console.log(recode)
+            // console.log(recode)
         },
         // 显示服务器跑步数据, 画出地图路线
         drawserMap(canvasId, recode){
@@ -1017,6 +1077,9 @@ export default {
                     })
                 })
                 this.Geolen_canvas = totalGeoLength
+                if(this.totalGeoLength_lock){
+                    this.totalGeoLength = totalGeoLength.toFixed(0)
+                }
             },
             deep: true
         },
@@ -1266,7 +1329,7 @@ export default {
     width: 100%;
     height: 100%;
     /* 背景图片 */
-    background-image: url(wkmap.jpg);
+    background-image: url(/wkmap.jpg);
     background-repeat: no-repeat;
     /* 不重复 */
     background-size: 100% 100%;
