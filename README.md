@@ -27,7 +27,7 @@ npm run build
 ```
 
 + 部署
-    - 使用`serve`或`http-server`
+    - 使用`serve`或`http-server`本地部署
     ```sh
     npm install -g serve
     serve -s dist
@@ -38,3 +38,6 @@ npm run build
     ```
 
     - 使用`Apache/Nginx` `GitHub Pages` `Netlify/Vercel`等平台运行
+
+## 后记
+    - `GitHub Pages` 和 `本地部署` 配置文件冲突, 已放弃`GitHub Pages`
