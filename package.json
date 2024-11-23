@@ -1,6 +1,7 @@
 {
   "name": "next_wkyd",
-  "version": "0.0.1",
+  "version": "0.0.3",
+  "require_wsnv": "0.0.2",
   "homepage": "https://github.com/xmexg/wsv",
   "private": true,
   "type": "module",
@@ -8,7 +9,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist"
+    "deploy": "vite build --mode deploy && gh-pages -d ghpages"
   },
   "dependencies": {
     "animate.css": "^4.1.1",

@@ -4,8 +4,8 @@
         <div id="content">
             <h2>其他产品</h2>
             <div id="product">
-                <div><a href="http://121.40.92.198:9090">旧版wkyd</a></div>
-                <div><a :href="`${service}/run`">wsn(springboot)内置wkyd</a></div>
+                <div class="normalScroll"><a href="http://124.220.82.47:9090">旧版wkyd(应该已停止服务) </a></div>
+                <div class="normalScroll"><a :href="`${service}/run`">wsn(springboot)内置wkyd</a></div>
                 <!-- <div>
                     <input type="number" placeholder="Xlong经度" v-model="inputx">
                     <input type="number" placeholder="Ylant经度" v-model="inputy">

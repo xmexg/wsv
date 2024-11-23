@@ -15,7 +15,7 @@
         <div class="ctrl_main">
             <h1 v-if="showstatus"><span v-for="(item, index) in loading_text" :class="{ jump: jump_index == index }">{{
                     item }}</span></h1>
-            <div v-if="!showstatus" class="status_form">
+            <div v-if="!showstatus" class="status_form normalScroll">
                 <div>注意必须有至少一条跑步记录(可以手动刷步也可以真人跑步)才能自动运动,否则不会自动运动</div>
                 <div>
                     <span>是否每日自动运动</span>

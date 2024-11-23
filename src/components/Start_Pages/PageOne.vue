@@ -1,19 +1,19 @@
 <template>
     <div id="logo">
-        <div v-if="show" class="animate__animated animate__zoomInDown">
+        <div v-if="show" class="animate__animated animate__zoomInDown normalScroll">
             <span v-for="item in thenext" class="textanimate" style="color: #ff6348">{{ item }}</span>&nbsp<span v-for="item in wkyd" class="textanimate" style="color: #0050c2">{{ item }}</span>
         </div>
         <div class="animate__animated animate__bounceInLeft text_color"><span v-for="item in text" class="textanimate">{{ item }}</span></div>
     </div>
-    <div v-if="showbar" id="bar" class="animate__animated animate__fadeInUp">
+    <div v-if="showbar" id="bar" class="animate__animated animate__fadeInUp normalScroll">
         <a href="#page2">自动运动</a>
         <a href="#page3">手动运动</a>
         <a href="#page4">其他产品</a>
         <a href="#page5">关于我们</a>
     </div>
     <div class="animate__animated animate__bounceInRight" style="position: absolute; bottom: 0; right: 0; color: #6b798e; text-align: right; font-size: 1rem; user-select: none;">
-        <p>version: <br>wsnv in wsnv0.0.1<br>wsns in {{ wsns_version }}</p>
-        <p>require: wsns >= 0.0.2</p>
+        <p>version: <br>wsnv in wsnv{{ appVersion }}<br>wsns in {{ wsns_version }}</p>
+        <p>require: wsns >= {{ require_wsnv }}</p>
     </div>
 </template>
 
@@ -22,7 +22,9 @@ import axios from 'axios'
 export default {
     data() {
         return {
-            wsns_version: '无法连接到wsns'
+            wsns_version: '无法连接到wsns',
+            appVersion: __APP_VERSION__,
+            require_wsnv: __REQUIRE_WSNS_VERSION__
         }
     },
     methods: {

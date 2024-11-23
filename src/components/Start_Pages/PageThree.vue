@@ -1,6 +1,7 @@
 <template>
     <div id="page">
         <div> 手动运动 </div>
+        <p>非规定时间跑步会被清空记录！</p>
         <!-- <p style="font-size: 1.3rem;">该功能尚未完全完成,请<a href="#page5">添加微信</a>使用自动运动, 或使用旧版<br><a
                 href="http://121.40.92.198:9090">http://121.40.92.198:9090</a>&nbsp<a
                 href="http://121.40.92.198:9091/run">http://121.40.92.198:9091</a></p> -->
@@ -62,11 +63,11 @@
                 </el-dialog>
                 <!-- 选择服务器端地图 -->
                 <el-dialog v-if="el_chooseMap" v-model="el_chooseMap" :title="`选择${decodedUserId(el_chooseMapUserid)}的地图`" draggable>
-                    <div  class="el_chooseMap">
-                        <div v-for="(recode, index) in runRecodes[el_chooseMapUserid]" :key="el_chooseMapUserid" class="choose_serMap">
-                            <img src="/wkmap.jpg" width="345" height="345" class="choose_serMap_img">
+                    <div  class="el_chooseMap normalScroll">
+                        <div v-for="(recode, index) in runRecodes[el_chooseMapUserid]" :key="el_chooseMapUserid" class="choose_serMap normalScroll">
+                            <img src="/wkmap.jpg" width="345" height="345" class="choose_serMap_img normalScroll">
                             <!-- 画板尺寸坑 -->
-                            <canvas class="choose_serMap_cav" :id="'canvas_' + encode_base(recode.runId)" width="345px" height="345px"></canvas>
+                            <canvas class="choose_serMap_cav normalScroll" :id="'canvas_' + encode_base(recode.runId)" width="345px" height="345px"></canvas>
                             <p class="choose_serMap_p">{{ recode.createTime }} {{ recode.outphoneInfo }}</p>
                             <el-button @click="setMapData(recode)" class="choose_serMap_btn">选择</el-button>
                         </div>
@@ -195,7 +196,7 @@
                             <div @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">使用"查看跑步评分 & 更新手机型号"功能选择服务器端地图</div>
                         </div>
                         <div v-else class="copy_mapType_div_show">
-                            <img class="copy_mapType_div_show_img" src="/wkmap.jpg" width="690" height="690">
+                            <img id="copy_mapType_div_show_img" class="copy_mapType_div_show_img" src="/wkmap.jpg" width="100%" height="100%">
                             <!-- 画板尺寸坑 -->
                             <canvas id="canvas_selected" class="copy_mapType_div_show_canvas" width="690" height="690"></canvas>
                             <p>详情占位符</p>
@@ -958,6 +959,9 @@ export default {
                     make_record = this.MAKE_RECORD(this.write_map)
                     break
                 case "copy_mapType":
+                    // 这里存在检测点，暂无法确认规则
+                    confirm("该功能会触发作弊检测，修复前暂停使用")
+                    return
                     make_record = this.MAKE_RECORD(this.selected_recode.markList)
                     break
             }
@@ -998,7 +1002,14 @@ export default {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.beginPath()
             ctx.strokeStyle = 'green'
-            const markList_json = JSON.parse(recode.markList)
+            const markList_json = ''
+            // 适配2024年10月14日坏json的格式转换器
+            try {
+                markList_json = JSON.parse(recode.markList)
+            } catch (error) {
+                // 此处json被转义了两次，解两次json
+                markList_json = JSON.parse(JSON.parse(recode.markList))
+            }
             markList_json.forEach((mark, index) => {
                 // const xyhalf = this.calLtoXY_half(mark.latLng.longitude, mark.latLng.latitude)
                 // 使用calLtoXY_custom
@@ -1540,6 +1551,8 @@ export default {
     position: relative;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    height: 100%;
 }
 .copy_mapType_div_show{
     position: relative;
@@ -1550,10 +1563,14 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
+    width: 100%;
+    height: 100%;
 }
 .copy_mapType_div_show_canvas{
     position: absolute;
     left: 0;
     top: 0;
+    width: 100%;
+    height: 100%;
 }
 </style>

@@ -34,7 +34,15 @@ npm run build
 
     或
     npm install -g http-server
-    http-server dist
+    http-server dist  // 默认8080端口
+    http-server dist -p 9093  // 指定9093端口
+    ```
+
+    - 配合`pm2`
+    ```sh
+    npm run build  // 构建项目
+    cd dist  // 进入构建目录
+    pm2 start http-server --name wsv-http-server -- -p 9093  // 使用pm2运行
     ```
 
     - 使用`Apache/Nginx` `GitHub Pages` `Netlify/Vercel`等平台运行
