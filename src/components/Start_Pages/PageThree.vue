@@ -40,11 +40,12 @@
                                             <th>总路程</th>
                                             <th>手机型号</th>
                                             <th>用户ID</th>
+                                            <th>风控</th>
                                             <th>中转用时</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="record in user_recodes" :key="record.runId">
+                                        <tr v-for="record in user_recodes" :key="record.runId" :class="{ 'record_block': record.block !== 0 }">
                                             <td>{{ record.id }}</td>
                                             <td>{{ record.size }}</td>
                                             <td>{{ record.runId }}</td>
@@ -53,6 +54,7 @@
                                             <td>{{ record.trueLength }}</td>
                                             <td @click="usephoneInfo" style="cursor: pointer; color: blue;">{{ record.outphoneInfo }}</td>
                                             <td>{{ record.userId }}</td>
+                                            <td>{{ record.block }}</td>
                                             <td>{{ record.serverSpendTime }}</td>
                                         </tr>
                                     </tbody>
@@ -64,7 +66,7 @@
                 <!-- 选择服务器端地图 -->
                 <el-dialog v-if="el_chooseMap" v-model="el_chooseMap" :title="`选择${decodedUserId(el_chooseMapUserid)}的地图`" draggable>
                     <div  class="el_chooseMap normalScroll">
-                        <div v-for="(recode, index) in runRecodes[el_chooseMapUserid]" :key="el_chooseMapUserid" class="choose_serMap normalScroll">
+                        <div v-for="(recode, index) in runRecodes[el_chooseMapUserid]" :key="el_chooseMapUserid" class="choose_serMap normalScroll" :class="{'choose_serMap_record_block': recode.block !== 0}">
                             <img src="/wkmap.jpg" width="345" height="345" class="choose_serMap_img normalScroll">
                             <!-- 画板尺寸坑 -->
                             <canvas class="choose_serMap_cav normalScroll" :id="'canvas_' + encode_base(recode.runId)" width="345px" height="345px"></canvas>
@@ -383,8 +385,8 @@ export default {
         const date = new Date()
         this.endTime = dayjs(date).format('YYYY-MM-DDTHH:mm:ss');
         
-        // 随机生成 1620 到 1740 秒（27 到 29 分钟）的时间差
-        const randomSeconds = Math.floor(Math.random() * 121) + 1620; // 随机 1620 到 1740 秒
+        // 随机生成 1560 到 1620 秒（26 到 28 分钟）的时间差
+        const randomSeconds = Math.floor(Math.random() * 121) + 1560;
         const randomMilliseconds = randomSeconds * 1000; // 转换为毫秒
 
         // 确保 date 是正确的 Date 类型或转换成时间戳后处理
@@ -614,7 +616,7 @@ export default {
                     onDownloadProgress: progressEvent => {
                         const xhr = progressEvent.event.target
                         const { responseText } = xhr
-                        console.log("=====responseText====== old:" + reslen + " new:" + responseText.length)
+                        console.log("=====responseText====== start:" + reslen + " end:" + responseText.length)
                         // 截取字符串，输出新增加的部分
                         let addpart = responseText.substring(reslen, responseText.length)
                         reslen = responseText.length // 必须赶在下次获取到数据前执行
@@ -641,6 +643,7 @@ export default {
                     }
                 }).then(response => { // 全部完成时
                     this.getRunRecodesAphonelist_lock = false;
+                    this.analy_markList(userid_base64)
                     // console.log(this.runRecodes[0])
                     // console.log(this.runRecodes)
                     // console.log(userid_base64);
@@ -663,11 +666,39 @@ export default {
                     // 将整个数组直接推入到 this.runRecodes[userid_base64] 中
                     this.runRecodes[userid_base64].push(...responseText);
                     this.getRunRecodesAphonelist_lock = false;
+                    this.analy_markList(userid_base64)
                 }).catch(err => {
                     console.error(err);
                     this.getRunRecodesAphonelist_lock = false;
                 });
             }
+        },
+        /**
+         * 跑步记录分析，适配2024年10月14日嵌套转义风控
+         */
+        analy_markList(userid_base64){
+            console.log("分析跑步记录", this.runRecodes[userid_base64])
+            this.runRecodes[userid_base64].forEach((element) => {
+                if (element.markList) {
+                    let i = -1;
+                    // 尝试最多解析 3 次
+                    while (i < 2 && typeof element.markList === "string") {
+                        try {
+                            element.markList = JSON.parse(element.markList);
+                        } catch (e) {
+                            console.error("JSON 解析失败:", element.markList, e);
+                            break; // 停止尝试解析
+                        }
+                        i++;
+                    }
+                    // 变回字符串，历史遗留问题，都是按字符串处理的
+                    if (typeof element.markList === "object") {
+                        element.markList = JSON.stringify(element.markList);
+                    }
+                    // 添加新属性 recode_block
+                    element.block = i;
+                }
+            });
         },
         /**
          * 地图相关
@@ -1002,14 +1033,7 @@ export default {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.beginPath()
             ctx.strokeStyle = 'green'
-            const markList_json = ''
-            // 适配2024年10月14日坏json的格式转换器
-            try {
-                markList_json = JSON.parse(recode.markList)
-            } catch (error) {
-                // 此处json被转义了两次，解两次json
-                markList_json = JSON.parse(JSON.parse(recode.markList))
-            }
+            const markList_json = JSON.parse(recode.markList)
             markList_json.forEach((mark, index) => {
                 // const xyhalf = this.calLtoXY_half(mark.latLng.longitude, mark.latLng.latitude)
                 // 使用calLtoXY_custom
@@ -1139,6 +1163,11 @@ export default {
 <style scoped>
 .hiddendiv {
     visibility: hidden;
+}
+
+/* 跑步记录被风控 */
+.record_block{
+    background: #e16d66;
 }
 
 #page {
@@ -1516,10 +1545,15 @@ export default {
     width: 345px;
     height: 345px;
     position: relative;
-    border: 1px solid #ffa39e;
+    border: 2px solid #0cc3e4;
     border-radius: 10px;
     background: #dfe4ea;
     margin: 10px;
+    overflow: hidden;
+}
+
+.choose_serMap_record_block{
+    border-color: red;
 }
 
 .choose_serMap_p{
