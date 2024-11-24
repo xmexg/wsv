@@ -1,6 +1,6 @@
 {
   "name": "next_wkyd",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "require_wsnv": "0.0.2",
   "homepage": "https://github.com/xmexg/wsv",
   "private": true,

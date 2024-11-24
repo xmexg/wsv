@@ -1,10 +1,6 @@
 <template>
     <div id="page">
         <div> 手动运动 </div>
-        <p>非规定时间跑步会被清空记录！</p>
-        <!-- <p style="font-size: 1.3rem;">该功能尚未完全完成,请<a href="#page5">添加微信</a>使用自动运动, 或使用旧版<br><a
-                href="http://121.40.92.198:9090">http://121.40.92.198:9090</a>&nbsp<a
-                href="http://121.40.92.198:9091/run">http://121.40.92.198:9091</a></p> -->
         <div class="content">
             <div id="form" class="normalScroll">
                 <div class="fd">salt:<input class="U D block" type="text" name="salt" id="salt"
@@ -19,7 +15,7 @@
                 <el-button class="downblock" @click="showRunRecodesAphonelist = !showRunRecodesAphonelist">查看跑步评分 & 更新手机型号</el-button>
                 <el-dialog v-model="showRunRecodesAphonelist" title="跑步评分" class="normalScroll el-dialog" draggable>
                     <div class="el_bar">
-                        <input type="number" max="15" class="el_usercode" :value="userId" ref="userId_search_input" placeholder="请输入要查询的学号">
+                        <input type="number" min="0" class="el_usercode" :value="userId" ref="userId_search_input" placeholder="请输入要查询的学号">
                         <button class="el_usercode_btn" @click="getRunRecodesAphonelist($refs.userId_search_input.value)" :disabled="getRunRecodesAphonelist_lock">{{ getRunRecodesAphonelist_lock ? "更新中" : "更新" }}</button>
                     </div>
                     <div class="userrecodelist">
@@ -64,7 +60,7 @@
                     </div>
                 </el-dialog>
                 <!-- 选择服务器端地图 -->
-                <el-dialog v-if="el_chooseMap" v-model="el_chooseMap" :title="`选择${decodedUserId(el_chooseMapUserid)}的地图`" draggable>
+                <el-dialog v-if="el_chooseMap" v-model="el_chooseMap" :title="`选择${decodedUserId(el_chooseMapUserid)}的地图`" class="normalScroll" draggable>
                     <div  class="el_chooseMap normalScroll">
                         <div v-for="(recode, index) in runRecodes[el_chooseMapUserid]" :key="el_chooseMapUserid" class="choose_serMap normalScroll" :class="{'choose_serMap_record_block': recode.block !== 0}">
                             <img src="/wkmap.jpg" width="345" height="345" class="choose_serMap_img normalScroll">
@@ -135,6 +131,7 @@
                         </button>
                     </div>
                 </div>
+                <p>非规定时间跑步会被风控！</p>
                 <div class="fd">开始时间:<input class="block" type="datetime-local" v-model="beginTime" id="beginTime" step="1"
                         placeholder="开始时间(2023-03-16 11:13:27)"></div>
                 <div class="fd">结束时间:<input class="block" type="datetime-local" v-model="endTime" id="endTime" step="1"
@@ -151,11 +148,6 @@
                 </div>
 
                 <div class="fd">地图类型:
-                    <!-- <select class="S block" name="mapdatatype" id="mapdatatype">
-                        <option value="m" selected onclick="mapshowmap()">画出跑步路线</option>
-                        <option class="D" value="b" onclick="mapshowtext()">自定义跑步json数据</option>
-                        <option value="o" onclick="mapshowOLDMAPD()">提交学校服务器已存在的数据</option>
-                    </select> -->
                     <select v-model="selectedMapType" class="S block">
                         <option v-for="subBrands in mapType" :value="subBrands.brand">{{ subBrands.name }}</option>
                     </select>
@@ -163,14 +155,6 @@
             </div>
             <div id="map" class="normalScroll">
                 <div id="mapcanvasdrawinfo">
-                    <!-- <div class="mapcanvasdrawinfoc_div">
-                        <div class="mapcanvasdrawinfoc_div_d1">节点总数:</div>
-                        <div class="mapcanvasdrawinfoc_div_d2" id="mcdid1_1"></div>
-                    </div>
-                    <div class="mapcanvasdrawinfoc_div">
-                        <div class="mapcanvasdrawinfoc_div_d1">记录节点:</div>
-                        <div class="mapcanvasdrawinfoc_div_d2" id="mcdid1_2"></div>
-                    </div> -->
                     <div class="mapcanvasdrawinfoc_div">
                         <div class="mapcanvasdrawinfoc_div_d1">参考路程(米):{{ Geolen_canvas + Geolen_temp }}</div>
                         <div class="mapcanvasdrawinfoc_div_d2" id="mcdid2"></div>
@@ -960,7 +944,7 @@ export default {
                 "beginTime": this.beginTime.replace("T", " "),
                 "endTime": this.endTime.replace("T", " "),
                 "campus": this.campus.toString(),
-                "markList": JSON.stringify(markList),
+                "markList": typeof markList === "object" ? JSON.stringify(markList) : markList,
                 "totalLength": this.totalGeoLength.toString(),
                 "totalTime": this.totalTimeLength.toString(),
                 "userCode": this.userId.toString()
@@ -991,8 +975,8 @@ export default {
                     break
                 case "copy_mapType":
                     // 这里存在检测点，暂无法确认规则
-                    confirm("该功能会触发作弊检测，修复前暂停使用")
-                    return
+                    // confirm("该功能会触发作弊检测，修复前暂停使用")
+                    // return
                     make_record = this.MAKE_RECORD(this.selected_recode.markList)
                     break
             }
@@ -1034,6 +1018,7 @@ export default {
             ctx.beginPath()
             ctx.strokeStyle = 'green'
             const markList_json = JSON.parse(recode.markList)
+            console.log("选择地图：", markList_json)
             markList_json.forEach((mark, index) => {
                 // const xyhalf = this.calLtoXY_half(mark.latLng.longitude, mark.latLng.latitude)
                 // 使用calLtoXY_custom
@@ -1145,6 +1130,20 @@ export default {
                 })
             }
             if(new_selectedMapType == "copy_mapType"){
+                if(this.selected_recode){
+                    console.log("绘制已选择的服务器端地图")
+                    if(this.totalGeoLength_lock){
+                        this.totalGeoLength = this.selected_recode.trueLength
+                    }
+                    this.$nextTick(() => {
+                        this.drawserMap('canvas_selected', this.selected_recode)
+                    })
+                }
+            }
+        },
+        // 监听选择的地图变化
+        selected_recode(new_recode){
+            if(this.selectedMapType == "copy_mapType"){
                 if(this.selected_recode){
                     console.log("绘制已选择的服务器端地图")
                     if(this.totalGeoLength_lock){
